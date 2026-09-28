@@ -313,15 +313,16 @@ async function loadPDFs(){
 function openPDF(url){
 
     const viewer = document.getElementById("pdfViewer");
-
     const frame = document.getElementById("pdfFrame");
 
-    frame.src = url;
+    const fullURL = new URL(url, window.location.href).href;
+
+    frame.src =
+        "https://mozilla.github.io/pdf.js/web/viewer.html?file=" +
+        encodeURIComponent(fullURL);
 
     viewer.style.display = "flex";
-
 }
-
 
 function closePDF(){
 
