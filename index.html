@@ -270,10 +270,7 @@ async function loadPDFs(){
         );
 
         if(pdfs.length === 0){
-
-            pdfList.innerHTML =
-                "<p>अभी कोई PDF उपलब्ध नहीं है।</p>";
-
+            pdfList.innerHTML = "<p>अभी कोई PDF उपलब्ध नहीं है।</p>";
             return;
         }
 
@@ -282,7 +279,8 @@ async function loadPDFs(){
         pdfs.forEach(file => {
 
             const pdfURL =
-                "Pdf/" + encodeURIComponent(file.name);
+                "https://raw.githubusercontent.com/ssodays/ssodays.github.io/main/Pdf/" +
+                encodeURIComponent(file.name);
 
             const item = document.createElement("div");
 
@@ -314,13 +312,12 @@ async function loadPDFs(){
 
         pdfList.innerHTML =
             "<p>PDFs load नहीं हो पाईं।</p>";
-
     }
 }
 
 loadPDFs();
 
-           </script>
+</script>
 
 </body>
 </html>
