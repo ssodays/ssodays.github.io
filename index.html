@@ -274,12 +274,7 @@ async function loadPDFs(){
         pdfs.forEach(file => {
 
             const pdfURL =
-                "https://raw.githubusercontent.com/ssodays/ssodays.github.io/main/Pdf/" +
-                encodeURIComponent(file.name);
-
-            const viewURL =
-                "https://docs.google.com/gview?embedded=1&url=" +
-                encodeURIComponent(pdfURL);
+                "Pdf/" + encodeURIComponent(file.name);
 
             const item = document.createElement("div");
 
@@ -290,16 +285,15 @@ async function loadPDFs(){
                     📄 ${file.name}
                 </div>
 
-                <a class="btn"
-                   href="${viewURL}"
-                   target="_blank">
-                   View PDF
-                </a>
+                <button class="btn"
+                    onclick="openPDF('${pdfURL}')">
+                    View PDF
+                </button>
 
                 <a class="btn"
-                   href="${pdfURL}"
-                   download>
-                   Download
+                    href="${pdfURL}"
+                    download>
+                    Download
                 </a>
             `;
 
@@ -315,8 +309,34 @@ async function loadPDFs(){
     }
 }
 
-loadPDFs();
 
+function openPDF(url){
+
+    const viewer = document.getElementById("pdfViewer");
+
+    const frame = document.getElementById("pdfFrame");
+
+    frame.src = url;
+
+    viewer.style.display = "flex";
+
+}
+
+
+function closePDF(){
+
+    const viewer = document.getElementById("pdfViewer");
+
+    const frame = document.getElementById("pdfFrame");
+
+    frame.src = "";
+
+    viewer.style.display = "none";
+
+}
+
+
+loadPDFs();
 </script>
 
 </body>
