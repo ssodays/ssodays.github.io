@@ -168,32 +168,8 @@ footer{
     <div class="card">
         <h2>📄 PDF Documents</h2>
 
-        <div class="pdf-item">
-            <div class="pdf-title">
-                📘 Sample PDF
-            </div>
-
-            <a class="btn" href="pdf/sample.pdf" target="_blank">
-                View PDF
-            </a>
-
-            <a class="btn" href="pdf/sample.pdf" download>
-                Download
-            </a>
-        </div>
-
-        <div class="pdf-item">
-            <div class="pdf-title">
-                📄 Important Document
-            </div>
-
-            <a class="btn" href="#" target="_blank">
-                View PDF
-            </a>
-
-            <a class="btn" href="#" download>
-                Download
-            </a>
+        <div id="pdfList">
+            <p>PDFs loading...</p>
         </div>
 
     </div>
@@ -275,7 +251,76 @@ function showSection(id,button){
     window.scrollTo(0,0);
 }
 
-</script>
+
+async function loadPDFs(){
+
+    const pdfList = document.getElementById("pdfList");
+
+    try{
+
+        const response = await fetch(
+            "https://api.github.com/repos/ssodays/ssodays.github.io/contents/Pdf"
+        );
+
+        const files = await response.json();
+
+        const pdfs = files.filter(file =>
+            file.type === "file" &&
+            file.name.toLowerCase().endsWith(".pdf")
+        );
+
+        if(pdfs.length === 0){
+
+            pdfList.innerHTML =
+                "<p>अभी कोई PDF उपलब्ध नहीं है।</p>";
+
+            return;
+        }
+
+        pdfList.innerHTML = "";
+
+        pdfs.forEach(file => {
+
+            const pdfURL =
+                "Pdf/" + encodeURIComponent(file.name);
+
+            const item = document.createElement("div");
+
+            item.className = "pdf-item";
+
+            item.innerHTML = `
+                <div class="pdf-title">
+                    📄 ${file.name}
+                </div>
+
+                <a class="btn"
+                   href="${pdfURL}"
+                   target="_blank">
+                   View PDF
+                </a>
+
+                <a class="btn"
+                   href="${pdfURL}"
+                   download>
+                   Download
+                </a>
+            `;
+
+            pdfList.appendChild(item);
+
+        });
+
+    }catch(error){
+
+        pdfList.innerHTML =
+            "<p>PDFs load नहीं हो पाईं।</p>";
+
+    }
+}
+
+loadPDFs();
+
+           </script>
 
 </body>
 </html>
