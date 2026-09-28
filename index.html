@@ -15,48 +15,50 @@
 }
 
 body{
-    background:#f5f7fb;
+    background:#f4f7fb;
     color:#222;
 }
 
 header{
     background:#123b6d;
     color:white;
-    padding:18px 20px;
     text-align:center;
+    padding:22px 15px;
 }
 
 header h1{
-    font-size:28px;
+    font-size:32px;
 }
 
 header p{
-    margin-top:5px;
-    font-size:14px;
+    margin-top:7px;
+    font-size:15px;
 }
 
 nav{
     background:white;
     display:flex;
     justify-content:center;
-    gap:8px;
+    gap:5px;
     padding:10px;
-    box-shadow:0 2px 8px #ddd;
+    box-shadow:0 2px 10px #ddd;
     position:sticky;
     top:0;
+    z-index:10;
 }
 
 nav button{
     border:0;
     background:white;
-    padding:10px 16px;
-    border-radius:6px;
+    padding:11px 15px;
+    border-radius:8px;
     font-size:15px;
     cursor:pointer;
 }
 
-nav button:hover{
-    background:#e8f0fa;
+nav button:hover,
+nav button.active{
+    background:#e7f0fa;
 }
 
 .container{
@@ -76,25 +78,43 @@ nav button:hover{
 .card{
     background:white;
     padding:22px;
-    margin-bottom:15px;
-    border-radius:12px;
-    box-shadow:0 2px 10px #ddd;
+    margin-bottom:18px;
+    border-radius:14px;
+    box-shadow:0 3px 12px #ddd;
 }
 
 .card h2{
     color:#123b6d;
+    margin-bottom:12px;
+}
+
+.pdf-item,
+.notice-item,
+.game-item{
+    background:#f1f5fa;
+    padding:15px;
+    margin:10px 0;
+    border-radius:9px;
+}
+
+.pdf-title{
+    font-weight:bold;
     margin-bottom:10px;
 }
 
-.item{
-    display:block;
-    background:#f1f5fa;
-    padding:14px;
-    margin:10px 0;
-    border-radius:8px;
+.btn{
+    display:inline-block;
     text-decoration:none;
-    color:#123b6d;
-    font-weight:bold;
+    background:#123b6d;
+    color:white;
+    padding:9px 15px;
+    border-radius:7px;
+    margin-right:6px;
+    font-size:14px;
+}
+
+.notice-item{
+    border-left:5px solid #123b6d;
 }
 
 footer{
@@ -102,8 +122,7 @@ footer{
     background:#123b6d;
     color:white;
     text-align:center;
-    padding:18px;
-    font-size:14px;
+    padding:20px;
 }
 </style>
 </head>
@@ -116,83 +135,119 @@ footer{
 </header>
 
 <nav>
-    <button onclick="showSection('home')">🏠 Home</button>
-    <button onclick="showSection('pdf')">📄 PDF</button>
-    <button onclick="showSection('games')">🎮 Games</button>
-    <button onclick="showSection('notice')">📢 Notice</button>
+    <button class="active" onclick="showSection('home',this)">🏠 Home</button>
+    <button onclick="showSection('pdf',this)">📄 PDF</button>
+    <button onclick="showSection('games',this)">🎮 Games</button>
+    <button onclick="showSection('notice',this)">📢 Notice</button>
 </nav>
 
 <div class="container">
 
-    <section id="home" class="section active">
-        <div class="card">
-            <h2>Welcome to SSODAYS</h2>
-            <p>
-                Welcome to SSODAYS. Here you can find PDFs,
-                useful information, games and latest notices.
-            </p>
-        </div>
+<!-- HOME -->
+<section id="home" class="section active">
 
-        <div class="card">
-            <h2>Latest Updates</h2>
-            <p>New updates will be added here.</p>
-        </div>
-    </section>
+    <div class="card">
+        <h2>Welcome to SSODAYS</h2>
+        <p>
+            Welcome to SSODAYS. Find useful PDFs,
+            games, information and latest notices in one place.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>Latest Updates</h2>
+        <p>Latest updates will appear here.</p>
+    </div>
+
+</section>
 
 
-    <section id="pdf" class="section">
-        <div class="card">
-            <h2>📄 PDF</h2>
+<!-- PDF -->
+<section id="pdf" class="section">
 
-            <a class="item" href="#">
+    <div class="card">
+        <h2>📄 PDF Documents</h2>
+
+        <div class="pdf-item">
+            <div class="pdf-title">
                 📘 Sample PDF
+            </div>
+
+            <a class="btn" href="pdf/sample.pdf" target="_blank">
+                View PDF
             </a>
 
-            <a class="item" href="#">
+            <a class="btn" href="pdf/sample.pdf" download>
+                Download
+            </a>
+        </div>
+
+        <div class="pdf-item">
+            <div class="pdf-title">
                 📄 Important Document
-            </a>
-
-            <p style="margin-top:15px;">
-                More PDFs will be added soon.
-            </p>
-        </div>
-    </section>
-
-
-    <section id="games" class="section">
-        <div class="card">
-            <h2>🎮 Games</h2>
-
-            <a class="item" href="#">
-                🎯 Game 1
-            </a>
-
-            <a class="item" href="#">
-                🧩 Game 2
-            </a>
-
-            <p style="margin-top:15px;">
-                Games will be added here.
-            </p>
-        </div>
-    </section>
-
-
-    <section id="notice" class="section">
-        <div class="card">
-            <h2>📢 Notice</h2>
-
-            <div class="item">
-                📢 Welcome to SSODAYS
             </div>
 
-            <div class="item">
-                📢 Latest notice will appear here.
-            </div>
+            <a class="btn" href="#" target="_blank">
+                View PDF
+            </a>
+
+            <a class="btn" href="#" download>
+                Download
+            </a>
         </div>
-    </section>
+
+    </div>
+
+</section>
+
+
+<!-- GAMES -->
+<section id="games" class="section">
+
+    <div class="card">
+        <h2>🎮 Games</h2>
+
+        <div class="game-item">
+            🎯 Game 1
+            <br><br>
+            <a class="btn" href="#">Play Game</a>
+        </div>
+
+        <div class="game-item">
+            🧩 Game 2
+            <br><br>
+            <a class="btn" href="#">Play Game</a>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- NOTICE -->
+<section id="notice" class="section">
+
+    <div class="card">
+        <h2>📢 Latest Notices</h2>
+
+        <div class="notice-item">
+            <b>New Notice</b>
+            <br><br>
+            Latest notice will appear here.
+        </div>
+
+        <div class="notice-item">
+            <b>Important Update</b>
+            <br><br>
+            Important information will appear here.
+        </div>
+
+    </div>
+
+</section>
 
 </div>
+
 
 <footer>
     © 2026 SSODAYS • All Rights Reserved
@@ -200,19 +255,27 @@ footer{
 
 
 <script>
-function showSection(id){
+
+function showSection(id,button){
 
     document.querySelectorAll('.section')
-    .forEach(section => {
+    .forEach(section=>{
         section.classList.remove('active');
     });
 
-    document.getElementById(id)
-    .classList.add('active');
+    document.getElementById(id).classList.add('active');
+
+    document.querySelectorAll('nav button')
+    .forEach(btn=>{
+        btn.classList.remove('active');
+    });
+
+    button.classList.add('active');
 
     window.scrollTo(0,0);
 }
+
 </script>
 
 </body>
-  </html>
+</html>
