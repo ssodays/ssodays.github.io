@@ -148,6 +148,12 @@ header p{
     padding:20px 10px 40px;
 
     background:#e5e5e5;
+
+    overflow:auto;
+
+    touch-action:pan-x pan-y pinch-zoom;
+
+    -webkit-overflow-scrolling:touch;
 }
 
 
@@ -239,7 +245,9 @@ header p{
 
     overflow:hidden;
 
-    max-width:100%;
+    max-width:none;
+
+    flex-shrink:0;
 }
 
 
@@ -248,7 +256,7 @@ header p{
 .pdf-page canvas{
     display:block;
 
-    max-width:100%;
+    max-width:none;
 
     height:auto;
 }
@@ -263,8 +271,6 @@ header p{
     left:0;
 
     z-index:10;
-
-    touch-action:none;
 }
 
 
@@ -536,25 +542,37 @@ footer{
 
     .pdf-area{
         padding:12px 5px 30px;
+
+        overflow:auto;
+
+        touch-action:pan-x pan-y pinch-zoom;
+
+        -webkit-overflow-scrolling:touch;
     }
 
 
-    .welcome{
-        margin:50px auto;
+    .pdf-container{
+        align-items:flex-start;
 
-        padding:25px 15px;
-    }
-
-
-    .welcome-icon{
-        font-size:45px;
+        min-width:max-content;
     }
 
 
     .pdf-page{
-        width:100%;
+        width:auto;
 
-        max-width:100%;
+        max-width:none;
+
+        flex-shrink:0;
+    }
+
+
+    .pdf-page canvas{
+        max-width:none;
+
+        width:auto;
+
+        height:auto;
     }
 
 }
@@ -600,4 +618,4 @@ footer{
         font-size:12px;
     }
 
-  }
+    }
