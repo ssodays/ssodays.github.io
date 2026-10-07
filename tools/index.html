@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>SSODAYS - Image Tools</title>
+
+<link
+    rel="stylesheet"
+    href="style.css"
+>
+
+<!-- Cropper.js -->
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css"
+>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <h1>🛠️ Image Tools</h1>
+
+    <p>
+        Crop • Zoom • Rotate • Resize • KB Converter
+    </p>
+
+</header>
+
+
+<div class="container">
+
+
+<div class="card">
+
+    <h2>
+        📷 Select Photo
+    </h2>
+
+    <input
+        type="file"
+        id="imageInput"
+        class="tool-input"
+        accept="image/*"
+    >
+
+
+    <!-- ================= EDITOR ================= -->
+
+    <div
+        id="imageEditor"
+        style="display:none;"
+    >
+
+
+        <div
+            class="image-editor-area"
+            id="imageEditorArea"
+        >
+
+            <img
+                id="editImage"
+                alt="Selected Image"
+            >
+
+        </div>
+
+
+        <!-- ================= ROTATE ================= -->
+
+        <div class="rotate-controls">
+
+
+            <button
+                class="btn"
+                type="button"
+                id="rotateLeftBtn"
+            >
+                ↶ -1°
+            </button>
+
+
+            <input
+                type="range"
+                id="rotateSlider"
+                min="-180"
+                max="180"
+                value="0"
+                step="1"
+            >
+
+
+            <button
+                class="btn"
+                type="button"
+                id="rotateRightBtn"
+            >
+                ↷ +1°
+            </button>
+
+        </div>
+
+
+        <div class="rotate-value">
+
+            Rotation:
+            <span id="rotateValue">0</span>°
+
+        </div>
+
+
+        <!-- ================= ZOOM ================= -->
+
+        <div class="zoom-controls">
+
+
+            <button
+                class="btn"
+                type="button"
+                id="zoomOutBtn"
+            >
+                🔍 −
+            </button>
+
+
+            <button
+                class="btn"
+                type="button"
+                id="zoomInBtn"
+            >
+                🔍 +
+            </button>
+
+
+            <button
+                class="btn"
+                type="button"
+                id="resetEditorBtn"
+            >
+                🔄 Reset
+            </button>
+
+
+        </div>
+
+
+        <!-- ================= APPLY CROP ================= -->
+
+        <div class="tool-row">
+
+
+            <button
+                class="btn"
+                type="button"
+                id="applyCropBtn"
+            >
+                ✂️ Apply Crop
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- ================= CROPPED RESULT ================= -->
+
+<div
+    class="card"
+    id="resultCard"
+    style="display:none;"
+>
+
+
+    <h2>
+        ✅ Cropped Photo
+    </h2>
+
+
+    <div
+        class="result-image-box"
+    >
+
+        <img
+            id="croppedPreview"
+            alt="Cropped Photo"
+        >
+
+    </div>
+
+
+    <!-- ================= SIZE ================= -->
+
+    <h3>
+        📐 Photo Size
+    </h3>
+
+
+    <div class="tool-row">
+
+
+        <input
+            type="number"
+            id="imageWidth"
+            placeholder="Width (px)"
+            min="1"
+        >
+
+
+        <input
+            type="number"
+            id="imageHeight"
+            placeholder="Height (px)"
+            min="1"
+        >
+
+
+    </div>
+
+
+
+    <!-- ================= FORMAT / KB ================= -->
+
+    <h3>
+        📦 Format & KB
+    </h3>
+
+
+    <div class="tool-row">
+
+
+        <select id="imageFormat">
+
+
+            <option value="image/jpeg">
+                JPG
+            </option>
+
+
+            <option value="image/webp">
+                WEBP
+            </option>
+
+
+            <option value="image/png">
+                PNG
+            </option>
+
+
+        </select>
+
+
+        <input
+            type="number"
+            id="targetKB"
+            placeholder="Target KB"
+            min="1"
+        >
+
+
+    </div>
+
+
+
+    <!-- ================= PROCESS ================= -->
+
+    <div class="tool-row">
+
+
+        <button
+            class="btn"
+            type="button"
+            id="processImageBtn"
+        >
+            🔄 Resize / Convert
+        </button>
+
+
+    </div>
+
+
+
+    <!-- ================= STATUS ================= -->
+
+    <div
+        id="toolStatus"
+        class="tool-status"
+    >
+    </div>
+
+
+
+    <!-- ================= FINAL RESULT ================= -->
+
+    <div
+        id="toolResult"
+        class="tool-result"
+    >
+    </div>
+
+
+</div>
+
+
+</div>
+
+
+
+<footer>
+
+    <a
+        href="../index.html"
+        class="back-btn"
+    >
+        ← Back to SSODAYS
+    </a>
+
+
+    <br><br>
+
+    © 2026 SSODAYS • All Rights Reserved
+
+</footer>
+
+
+
+<!-- Cropper.js -->
+
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js">
+</script>
+
+
+<!-- Image Tools JavaScript -->
+
+<script src="script.js"></script>
+
+
+</body>
+
+  </html>
