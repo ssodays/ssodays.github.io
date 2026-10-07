@@ -98,7 +98,7 @@ header p{
 .image-editor-area{
     position:relative;
     width:100%;
-    max-width:850px;
+    max-width:600px;
     margin:15px auto;
     background:#fff;
     border-radius:8px;
