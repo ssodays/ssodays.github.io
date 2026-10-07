@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-
 <title>SSODAYS PDF Editor</title>
 
 <link rel="stylesheet"
@@ -11,2152 +10,781 @@ href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css"
 
 <style>
 *{box-sizing:border-box}
-
-html,body{
-margin:0;
-height:100%;
-font-family:Arial,sans-serif;
-background:#525659;
-overflow:hidden;
-}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#29282d}
+body{display:flex;flex-direction:column}
 
 .topbar{
-height:58px;
-background:#0d477d;
-color:#fff;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 10px;
-position:relative;
-z-index:100;
+height:64px;flex:0 0 64px;background:#174b7d;color:#fff;
+display:flex;align-items:center;justify-content:space-between;
+padding:0 20px;font-size:22px;font-weight:700
+}
+.topbar button{
+background:#fff;border:0;border-radius:10px;padding:12px 18px;
+font-size:18px;color:#222;cursor:pointer
 }
 
-.title{
-font-size:20px;
-font-weight:700;
+.editorbar{
+height:54px;flex:0 0 54px;background:#323136;border-bottom:1px solid #111;
+display:flex;align-items:center;gap:6px;padding:5px 8px;
+overflow-x:auto;white-space:nowrap
 }
-
-.top-btn{
-border:0;
-background:#fff;
-color:#163d63;
-border-radius:8px;
-padding:11px 15px;
-font-size:16px;
-font-weight:700;
+.editorbar button,.editorbar label{
+height:42px;min-width:42px;border:0;border-radius:5px;
+background:#3d3c42;color:#eee;font-size:16px;cursor:pointer;
+display:inline-flex;align-items:center;justify-content:center;padding:0 11px
 }
-
-.toolbar{
-height:58px;
-background:#333;
-display:flex;
-align-items:center;
-gap:7px;
-padding:7px 10px;
-overflow-x:auto;
-white-space:nowrap;
-position:relative;
-z-index:100;
-}
-
-.tool-btn{
-border:0;
-background:#444;
-color:#fff;
-border-radius:7px;
-padding:10px 13px;
-font-size:15px;
-min-height:42px;
-flex-shrink:0;
-}
-
-.tool-btn.active{
-background:#0d6efd;
-}
-
-.tool-btn.download{
-background:#198754;
-}
-
-.tool-btn.danger{
-background:#a83232;
-}
-
-.file-btn{
-display:inline-flex;
-align-items:center;
-cursor:pointer;
-}
-
-.page-input{
-width:72px;
-height:42px;
-border:0;
-border-radius:7px;
-text-align:center;
-font-size:18px;
-flex-shrink:0;
-}
-
-.page-total{
-color:#fff;
-font-size:17px;
-}
-
-#status{
-position:absolute;
-left:0;
-right:0;
-top:116px;
-z-index:80;
-background:#222;
-color:#fff;
-text-align:center;
-padding:5px;
-font-size:13px;
-}
+.editorbar button:hover,.editorbar label:hover{background:#55535a}
+.editorbar .active{background:#174b7d}
+.editorbar input[type=file]{display:none}
+.sep{height:32px;width:1px;background:#666;margin:0 3px}
 
 #viewerContainer{
-position:absolute;
-top:116px;
-bottom:0;
-left:0;
-right:0;
-overflow:auto;
-background:#525659;
--webkit-overflow-scrolling:touch;
+position:relative;flex:1;overflow:auto;background:#29282d;
+-webkit-overflow-scrolling:touch
 }
-
-#viewer{
-padding-bottom:40px;
-}
-
-#viewer .page{
+#viewer{position:relative}
+.pdfViewer .page{
 position:relative;
-margin:8px auto;
+margin:10px auto;
+background:#fff
+}
+.annotationOverlay{
+position:absolute;left:0;top:0;right:0;bottom:0;
+z-index:20;pointer-events:none
+}
+.annotationCanvas{
+position:absolute;left:0;top:0;width:100%;height:100%;
+z-index:21;pointer-events:none
+}
+.annotationItem{
+position:absolute;z-index:22;pointer-events:auto;
+user-select:none;touch-action:none
+}
+.textItem{
+padding:2px 4px;background:transparent;white-space:nowrap;
+font-family:Arial,sans-serif;color:#111;cursor:move
+}
+.imageItem{
+border:1px dashed #1976d2;cursor:move;overflow:hidden;
+background:rgba(255,255,255,.05)
+}
+.imageItem img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.resizeHandle{
+position:absolute;width:14px;height:14px;right:-7px;bottom:-7px;
+background:#1976d2;border:2px solid #fff;border-radius:50%;
+cursor:nwse-resize
+}
+.deleteHandle{
+position:absolute;right:-10px;top:-10px;width:20px;height:20px;
+border:0;border-radius:50%;background:#d32f2f;color:#fff;
+font-size:13px;line-height:20px;padding:0;cursor:pointer
 }
 
-#viewer .canvasWrapper{
-overflow:visible!important;
+#empty{
+position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+color:#aaa;font-size:18px;text-align:center;padding:30px;pointer-events:none
+}
+#emptyBox{
+background:#333239;border:1px solid #4b4a50;border-radius:12px;padding:30px 25px;
+max-width:420px
+}
+#emptyBox b{display:block;color:#fff;font-size:25px;margin-bottom:12px}
+#status{
+position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+background:#111;color:#fff;padding:8px 14px;border-radius:20px;
+font-size:14px;z-index:100;display:none
 }
 
-#viewer canvas{
-image-rendering:auto;
+.toolSelect{
+background:#3d3c42;color:#fff;border:1px solid #666;border-radius:5px;
+height:38px;padding:0 7px
 }
-
-.edit-overlay{
-position:absolute;
-inset:0;
-z-index:20;
-pointer-events:none;
-}
-
-.draw-canvas{
-position:absolute;
-inset:0;
-width:100%;
-height:100%;
-pointer-events:none;
-}
-
-.edit-item{
-position:absolute;
-pointer-events:auto;
-user-select:none;
-}
-
-.edit-text{
-color:#111;
-white-space:pre-wrap;
-cursor:move;
-font-family:Arial,sans-serif;
-padding:2px;
-}
-
-.edit-image-wrap{
-border:1px dashed transparent;
-cursor:move;
-}
-
-.edit-image-wrap.selected{
-border:2px dashed #0d6efd;
-}
-
-.edit-image-wrap img{
-display:block;
-width:100%;
-height:100%;
-object-fit:contain;
-}
-
-.resize-handle{
-position:absolute;
-width:16px;
-height:16px;
-right:-8px;
-bottom:-8px;
-background:#0d6efd;
-border-radius:50%;
-display:none;
-cursor:nwse-resize;
-}
-
-.edit-image-wrap.selected .resize-handle{
-display:block;
-}
-
-#welcome{
-position:absolute;
-z-index:90;
-top:116px;
-left:0;
-right:0;
-bottom:0;
-background:#525659;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:20px;
-}
-
-.welcome-box{
-background:#fff;
-border-radius:22px;
-padding:40px 24px;
-text-align:center;
-width:min(92%,600px);
-box-shadow:0 8px 30px #0005;
-}
-
-.welcome-icon{
-font-size:65px;
-}
-
-.welcome-box h1{
-color:#123f70;
-margin:8px 0;
-font-size:38px;
-}
-
-.welcome-box p{
-font-size:21px;
-color:#555;
-}
-
-.choose-btn{
-display:inline-block;
-background:#123f70;
-color:#fff;
-padding:15px 25px;
-border-radius:9px;
-font-size:20px;
-cursor:pointer;
-}
-
-.welcome-box small{
-display:block;
-margin-top:25px;
-color:#777;
-font-size:16px;
-}
-
-#toast{
-position:fixed;
-left:50%;
-bottom:20px;
-transform:translateX(-50%);
-background:#222;
-color:#fff;
-padding:10px 16px;
-border-radius:8px;
-z-index:200;
-display:none;
-}
-
-@media(max-width:600px){
-
-.title{
-font-size:17px;
-}
-
-.top-btn{
-font-size:14px;
-padding:9px 12px;
-}
-
-.welcome-box{
-padding:30px 18px;
-}
-
-.welcome-box h1{
-font-size:30px;
-}
-
-.welcome-box p{
-font-size:18px;
-}
-
-}
+#pageInput{width:58px;text-align:center}
+#textSize{width:58px;text-align:center}
+.small{font-size:13px;color:#bbb}
 </style>
 </head>
 
 <body>
 
-<header class="topbar">
-
-<div class="title">
-📄 SSODAYS PDF Editor
+<div class="topbar">
+  <span>📄 PDF Editor</span>
+  <button id="closeBtn">✕ Close</button>
 </div>
 
-<button class="top-btn" id="closeBtn">
-✕ Close
-</button>
+<div class="editorbar">
+  <label title="Open PDF">📂 PDF<input id="pdfInput" type="file" accept="application/pdf,.pdf"></label>
 
-</header>
+  <button id="sideBtn" title="Sidebar">▣</button>
+  <button id="searchBtn" title="Search">⌕</button>
 
+  <button id="prevBtn" title="Previous page">◀</button>
+  <input id="pageInput" value="1" min="1" type="number">
+  <span style="color:#ddd">/ <span id="pageCount">0</span></span>
+  <button id="nextBtn" title="Next page">▶</button>
 
-<div class="toolbar">
+  <button id="zoomOutBtn" title="Zoom out">−</button>
+  <button id="zoomInBtn" title="Zoom in">+</button>
+  <button id="fitBtn" title="Fit width">↔</button>
 
-<label class="tool-btn file-btn">
-📂 PDF
-<input
-id="pdfInput"
-type="file"
-accept="application/pdf,.pdf"
-hidden>
-</label>
+  <span class="sep"></span>
 
-<button class="tool-btn" id="prevBtn">◀</button>
+  <button id="pencilBtn" title="Pencil">✎</button>
+  <button id="highlightBtn" title="Highlight">🖍</button>
+  <button id="textBtn" title="Text">T</button>
+  <label title="Add image">🖼<input id="imageInput" type="file" accept="image/*"></label>
+  <button id="undoBtn" title="Undo">↶</button>
+  <button id="clearBtn" title="Clear current page">🗑</button>
+  <button id="downloadBtn" title="Download edited PDF">⬇</button>
 
-<input
-class="page-input"
-id="pageNumber"
-type="number"
-min="1"
-value="1">
-
-<span class="page-total">
-/
-<span id="pageCount">0</span>
-</span>
-
-<button class="tool-btn" id="nextBtn">▶</button>
-
-<button class="tool-btn" id="zoomOutBtn">−</button>
-
-<button class="tool-btn" id="zoomInBtn">+</button>
-
-<button class="tool-btn" id="fitBtn">↔ Fit</button>
-
-<button class="tool-btn" id="pencilBtn">
-✏️ Pencil
-</button>
-
-<button class="tool-btn" id="highlightBtn">
-🖍 Highlight
-</button>
-
-<button class="tool-btn" id="textBtn">
-T Text
-</button>
-
-<label class="tool-btn file-btn">
-🖼 Image
-<input
-id="imageInput"
-type="file"
-accept="image/*"
-hidden>
-</label>
-
-<button class="tool-btn" id="undoBtn">
-↩ Undo
-</button>
-
-<button class="tool-btn danger" id="clearBtn">
-🗑 Clear
-</button>
-
-<button class="tool-btn download" id="downloadBtn">
-⬇ Download
-</button>
-
+  <span class="sep"></span>
+  <span class="small">Text</span>
+  <input id="textSize" class="toolSelect" type="number" min="8" max="120" value="20">
 </div>
-
-
-<div id="status">
-पहले PDF चुनें।
-</div>
-
 
 <div id="viewerContainer">
-
-<div
-id="viewer"
-class="pdfViewer">
+  <div id="viewer" class="pdfViewer"></div>
+  <div id="empty">
+    <div id="emptyBox">
+      <b>PDF Viewer</b>
+      PDF चुनें और browser में edit करें।<br><br>
+      📂 ऊपर <b style="display:inline;font-size:18px">PDF</b> बटन दबाकर PDF चुनें।
+      <br><br>
+      <span style="font-size:14px">PDF server पर upload नहीं होगी।</span>
+    </div>
+  </div>
 </div>
 
-</div>
-
-
-<div id="welcome">
-
-<div class="welcome-box">
-
-<div class="welcome-icon">
-📄
-</div>
-
-<h1>
-PDF Editor
-</h1>
-
-<p>
-अपनी PDF चुनें और browser में edit करें।
-</p>
-
-<label class="choose-btn">
-
-📂 PDF चुनें
-
-<input
-id="welcomeInput"
-type="file"
-accept="application/pdf,.pdf"
-hidden>
-
-</label>
-
-<small>
-आपकी PDF server पर upload नहीं होगी।
-</small>
-
-</div>
-
-</div>
-
-
-<div id="toast"></div>
-
+<div id="status"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 
 <script>
-
-"use strict";
-
 pdfjsLib.GlobalWorkerOptions.workerSrc =
 "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
+const $ = id => document.getElementById(id);
 
-const $ = id =>
-document.getElementById(id);
+const viewerContainer = $("viewerContainer");
+const viewer = $("viewer");
 
+const eventBus = new pdfjsViewer.EventBus();
+const linkService = new pdfjsViewer.PDFLinkService({eventBus:eventBus});
 
-const viewerContainer =
-$("viewerContainer");
-
-const viewer =
-$("viewer");
-
-const welcome =
-$("welcome");
-
-const status =
-$("status");
-
-const pageNumber =
-$("pageNumber");
-
-const pageCount =
-$("pageCount");
-
-
-const eventBus =
-new pdfjsViewer.EventBus();
-
-
-const linkService =
-new pdfjsViewer.PDFLinkService({
-eventBus:eventBus
+const pdfViewer = new pdfjsViewer.PDFViewer({
+  container: viewerContainer,
+  viewer: viewer,
+  eventBus: eventBus,
+  linkService: linkService,
+  textLayerMode: 1,
+  annotationMode: 2,
+  maxCanvasPixels: 16777216
 });
-
-
-const pdfViewer =
-new pdfjsViewer.PDFViewer({
-
-container:viewerContainer,
-
-viewer:viewer,
-
-eventBus:eventBus,
-
-linkService:linkService,
-
-textLayerMode:1,
-
-annotationMode:2,
-
-maxCanvasPixels:16777216,
-
-enableHWA:true
-
-});
-
 
 linkService.setViewer(pdfViewer);
 
+let pdfDocument = null;
+let pdfBytes = null;
+let currentFile = null;
+let activeTool = null;
+let pages = {};
+let history = {};
+let drawing = null;
+let resizeTimer = null;
 
-let pdfDocument=null;
-let pdfBytes=null;
-let currentPage=1;
-let currentTool=null;
-let pages={};
-let history=[];
-let drawing=null;
-
-
-function msg(text){
-
-status.textContent=text;
-
+function toast(msg){
+  const s=$("status");
+  s.textContent=msg;
+  s.style.display="block";
+  clearTimeout(toast.timer);
+  toast.timer=setTimeout(()=>s.style.display="none",1800);
 }
 
-
-function toast(text){
-
-const box=$("toast");
-
-box.textContent=text;
-
-box.style.display="block";
-
-clearTimeout(toast.timer);
-
-toast.timer=setTimeout(
-()=>{
-box.style.display="none";
-},
-2200
-);
-
+function pageNumberFromElement(el){
+  const page = el.closest(".page");
+  return page ? Number(page.dataset.pageNumber) : 1;
 }
 
-
-function state(number){
-
-if(!pages[number]){
-
-pages[number]={
-strokes:[],
-texts:[],
-images:[],
-overlay:null
-};
-
+function getPageData(n){
+  if(!pages[n]){
+    pages[n]={
+      drawings:[],
+      texts:[],
+      images:[]
+    };
+  }
+  return pages[n];
 }
 
-return pages[number];
-
+function saveHistory(n){
+  const p=getPageData(n);
+  history[n]=JSON.parse(JSON.stringify(p));
 }
 
+function restore(n){
+  const page=viewer.querySelector('.page[data-page-number="'+n+'"]');
+  if(!page) return;
 
-function overlayFor(pageDiv){
+  let overlay=page.querySelector(".annotationOverlay");
+  if(!overlay){
+    overlay=document.createElement("div");
+    overlay.className="annotationOverlay";
+    page.appendChild(overlay);
+  }
 
-const number=
-Number(pageDiv.dataset.pageNumber);
+  overlay.innerHTML="";
+  const p=getPageData(n);
 
-if(!number)
-return null;
+  const canvas=document.createElement("canvas");
+  canvas.className="annotationCanvas";
+  canvas.width=Math.max(1,Math.round(page.clientWidth*2));
+  canvas.height=Math.max(1,Math.round(page.clientHeight*2));
+  canvas.style.width="100%";
+  canvas.style.height="100%";
+  overlay.appendChild(canvas);
 
-let overlay=
-pageDiv.querySelector(".edit-overlay");
+  const ctx=canvas.getContext("2d");
+  const sx=canvas.width/page.clientWidth;
+  const sy=canvas.height/page.clientHeight;
 
-if(!overlay){
+  p.drawings.forEach(d=>{
+    if(!d.points || d.points.length<2) return;
+    ctx.save();
+    ctx.lineCap="round";
+    ctx.lineJoin="round";
+    ctx.lineWidth=d.width*Math.max(sx,sy);
+    ctx.strokeStyle=d.color;
+    if(d.highlight){
+      ctx.globalAlpha=.30;
+      ctx.lineWidth=d.width*2.5*Math.max(sx,sy);
+    }
+    ctx.beginPath();
+    ctx.moveTo(d.points[0].x*sx,d.points[0].y*sy);
+    for(let i=1;i<d.points.length;i++){
+      ctx.lineTo(d.points[i].x*sx,d.points[i].y*sy);
+    }
+    ctx.stroke();
+    ctx.restore();
+  });
 
-overlay=
-document.createElement("div");
+  p.texts.forEach((t,i)=>{
+    const el=document.createElement("div");
+    el.className="annotationItem textItem";
+    el.textContent=t.text;
+    el.style.left=t.x+"px";
+    el.style.top=t.y+"px";
+    el.style.fontSize=t.size+"px";
+    el.style.color=t.color||"#111";
+    makeMovable(el, page, t);
+    overlay.appendChild(el);
+  });
 
-overlay.className="edit-overlay";
+  p.images.forEach((im,i)=>{
+    const box=document.createElement("div");
+    box.className="annotationItem imageItem";
+    box.style.left=im.x+"px";
+    box.style.top=im.y+"px";
+    box.style.width=im.w+"px";
+    box.style.height=im.h+"px";
 
-pageDiv.appendChild(overlay);
+    const img=document.createElement("img");
+    img.src=im.src;
+    box.appendChild(img);
 
-state(number).overlay=overlay;
+    const del=document.createElement("button");
+    del.className="deleteHandle";
+    del.textContent="×";
+    del.title="Delete image";
+    del.onclick=(e)=>{
+      e.stopPropagation();
+      saveHistory(n);
+      p.images.splice(i,1);
+      restore(n);
+    };
+    box.appendChild(del);
 
-overlay.addEventListener(
-"pointerdown",
-function(e){
+    const rh=document.createElement("div");
+    rh.className="resizeHandle";
+    box.appendChild(rh);
 
-if(
-currentTool==="pencil" ||
-currentTool==="highlight"
-){
+    makeMovable(box,page,im);
+    makeResizable(box,page,im,rh);
 
-drawStart(
-e,
-number,
-overlay
-);
-
+    overlay.appendChild(box);
+  });
 }
 
-}
-);
+function makeMovable(el,page,data){
+  let sx=0,sy=0,ox=0,oy=0,moving=false;
 
-}else{
+  function start(e){
+    if(e.target.classList.contains("resizeHandle") ||
+       e.target.classList.contains("deleteHandle")) return;
+    const pt=e.touches?e.touches[0]:e;
+    moving=true;sx=pt.clientX;sy=pt.clientY;ox=data.x;oy=data.y;
+    e.preventDefault();
+  }
 
-state(number).overlay=overlay;
+  function move(e){
+    if(!moving)return;
+    const pt=e.touches?e.touches[0]:e;
+    data.x=ox+(pt.clientX-sx);
+    data.y=oy+(pt.clientY-sy);
+    el.style.left=data.x+"px";
+    el.style.top=data.y+"px";
+    e.preventDefault();
+  }
 
-}
+  function end(){moving=false}
 
-return overlay;
-
-}
-
-
-function prepare(){
-
-document
-.querySelectorAll("#viewer .page")
-.forEach(overlayFor);
-
-}
-
-
-eventBus.on(
-"pagesinit",
-function(){
-
-pageCount.textContent=
-pdfDocument.numPages;
-
-pdfViewer.currentPageNumber=1;
-
-pdfViewer.currentScaleValue=
-"page-width";
-
-prepare();
-
-msg("✅ PDF खुल गई।");
-
-}
-);
-
-
-eventBus.on(
-"pagechanging",
-function(e){
-
-currentPage=e.pageNumber;
-
-pageNumber.value=e.pageNumber;
-
-prepare();
-
-}
-);
-
-
-eventBus.on(
-"pagerendered",
-function(e){
-
-const page=
-document.querySelector(
-'#viewer .page[data-page-number="'+
-e.pageNumber+
-'"]'
-);
-
-if(page){
-
-overlayFor(page);
-
-restore(e.pageNumber);
-
+  el.addEventListener("pointerdown",start);
+  window.addEventListener("pointermove",move,{passive:false});
+  window.addEventListener("pointerup",end);
 }
 
-}
-);
+function makeResizable(el,page,data,handle){
+  let sx=0,sy=0,ow=0,oh=0,resizing=false;
 
+  handle.addEventListener("pointerdown",e=>{
+    resizing=true;
+    sx=e.clientX;sy=e.clientY;
+    ow=data.w;oh=data.h;
+    e.preventDefault();
+    e.stopPropagation();
+  });
 
-eventBus.on(
-"scalechanging",
-function(){
+  window.addEventListener("pointermove",e=>{
+    if(!resizing)return;
+    data.w=Math.max(40,ow+(e.clientX-sx));
+    data.h=Math.max(30,oh+(e.clientY-sy));
+    el.style.width=data.w+"px";
+    el.style.height=data.h+"px";
+  });
 
-setTimeout(
-function(){
-
-prepare();
-
-for(const n in pages){
-
-restore(Number(n));
-
-}
-
-},
-150
-);
-
-};
-
-
-async function loadPDF(file){
-
-if(!file)
-return;
-
-if(
-!file.name.toLowerCase().endsWith(".pdf")
-){
-
-alert("कृपया PDF file चुनें।");
-
-return;
-
+  window.addEventListener("pointerup",()=>resizing=false);
 }
 
-try{
+function drawStart(e){
+  if(!activeTool)return;
+  if(activeTool!=="pencil" && activeTool!=="highlight")return;
 
-msg("PDF load हो रही है...");
+  const page=e.target.closest(".page");
+  if(!page)return;
 
-const buffer=
-await file.arrayBuffer();
+  const n=Number(page.dataset.pageNumber);
+  saveHistory(n);
 
-pdfBytes=
-new Uint8Array(buffer);
+  const r=page.getBoundingClientRect();
+  const x=e.clientX-r.left;
+  const y=e.clientY-r.top;
 
-pages={};
+  drawing={
+    page:n,
+    color:activeTool==="highlight" ? "#ffff00" : "#d32f2f",
+    width:activeTool==="highlight" ? 12 : 3,
+    highlight:activeTool==="highlight",
+    points:[{x,y}]
+  };
 
-history=[];
-
-currentPage=1;
-
-const task=
-pdfjsLib.getDocument({
-data:pdfBytes,
-disableAutoFetch:false,
-disableStream:false
-});
-
-pdfDocument=
-await task.promise;
-
-welcome.style.display="none";
-
-pdfViewer.setDocument(pdfDocument);
-
-linkService.setDocument(
-pdfDocument,
-null
-);
-
-pageCount.textContent=
-pdfDocument.numPages;
-
-pageNumber.value=1;
-
-msg("✅ PDF खुल गई।");
-
-toast("PDF successfully open हो गई");
-
-}catch(error){
-
-console.error(error);
-
-pdfDocument=null;
-
-pdfBytes=null;
-
-pageCount.textContent="0";
-
-welcome.style.display="flex";
-
-msg("❌ PDF open नहीं हो पाई।");
-
-alert(
-"PDF open नहीं हो पाई। दूसरी PDF से test करें।"
-);
-
+  e.preventDefault();
 }
 
+function drawMove(e){
+  if(!drawing)return;
+
+  const page=viewer.querySelector('.page[data-page-number="'+drawing.page+'"]');
+  if(!page)return;
+
+  const r=page.getBoundingClientRect();
+  drawing.points.push({
+    x:e.clientX-r.left,
+    y:e.clientY-r.top
+  });
+
+  drawPreview(page);
+  e.preventDefault();
 }
-function drawStart(event,number,overlay){
-
-event.preventDefault();
-
-const rect=overlay.getBoundingClientRect();
-
-drawing={
-number:number,
-overlay:overlay,
-type:currentTool,
-points:[{
-x:(event.clientX-rect.left)/rect.width,
-y:(event.clientY-rect.top)/rect.height
-}],
-canvas:document.createElement("canvas")
-};
-
-const canvas=drawing.canvas;
-
-canvas.className="draw-canvas";
-
-canvas.width=Math.max(
-1,
-Math.round(rect.width)
-);
-
-canvas.height=Math.max(
-1,
-Math.round(rect.height)
-);
-
-overlay.appendChild(canvas);
-
-drawPreview();
-
-overlay.setPointerCapture?.(
-event.pointerId
-);
-
-overlay.addEventListener(
-"pointermove",
-drawMove
-);
-
-overlay.addEventListener(
-"pointerup",
-drawEnd,
-{once:true}
-);
-
-overlay.addEventListener(
-"pointercancel",
-drawEnd,
-{once:true}
-);
-
-}
-
-
-function drawMove(event){
-
-if(!drawing)
-return;
-
-const rect=
-drawing.overlay.getBoundingClientRect();
-
-drawing.points.push({
-
-x:(event.clientX-rect.left)/rect.width,
-
-y:(event.clientY-rect.top)/rect.height
-
-});
-
-drawPreview();
-
-}
-
 
 function drawEnd(){
-
-if(!drawing)
-return;
-
-const s=
-state(drawing.number);
-
-const object={
-type:drawing.type,
-points:drawing.points.slice()
-};
-
-s.strokes.push(object);
-
-history.push({
-page:drawing.number,
-type:"stroke",
-object:object
-});
-
-drawing.overlay.removeEventListener(
-"pointermove",
-drawMove
-);
-
-drawing=null;
-
+  if(!drawing)return;
+  getPageData(drawing.page).drawings.push(drawing);
+  const n=drawing.page;
+  drawing=null;
+  restore(n);
 }
 
-
-function drawPreview(){
-
-if(!drawing)
-return;
-
-const canvas=drawing.canvas;
-
-const ctx=
-canvas.getContext("2d");
-
-ctx.clearRect(
-0,
-0,
-canvas.width,
-canvas.height
-);
-
-ctx.lineCap="round";
-ctx.lineJoin="round";
-
-if(drawing.type==="highlight"){
-
-ctx.strokeStyle=
-"rgba(255,230,0,.35)";
-
-ctx.lineWidth=20;
-
-}else{
-
-ctx.strokeStyle="#111";
-
-ctx.lineWidth=3;
-
-}
-
-ctx.beginPath();
-
-drawing.points.forEach(
-function(point,index){
-
-const x=
-point.x*canvas.width;
-
-const y=
-point.y*canvas.height;
-
-if(index===0){
-
-ctx.moveTo(x,y);
-
-}else{
-
-ctx.lineTo(x,y);
-
-}
-
-}
-);
-
-ctx.stroke();
-
-}
-
-
-function restore(number){
-
-const s=state(number);
-
-const overlay=s.overlay;
-
-if(!overlay)
-return;
-
-overlay
-.querySelectorAll(
-".draw-canvas,.edit-item"
-)
-.forEach(
-element=>element.remove()
-);
-
-
-s.strokes.forEach(
-function(stroke){
-
-const rect=
-overlay.getBoundingClientRect();
-
-const canvas=
-document.createElement("canvas");
-
-canvas.className="draw-canvas";
-
-canvas.width=
-Math.max(
-1,
-Math.round(rect.width)
-);
-
-canvas.height=
-Math.max(
-1,
-Math.round(rect.height)
-);
-
-const ctx=
-canvas.getContext("2d");
-
-ctx.lineCap="round";
-ctx.lineJoin="round";
-
-if(stroke.type==="highlight"){
-
-ctx.strokeStyle=
-"rgba(255,230,0,.35)";
-
-ctx.lineWidth=20;
-
-}else{
-
-ctx.strokeStyle="#111";
-
-ctx.lineWidth=3;
-
-}
-
-ctx.beginPath();
-
-stroke.points.forEach(
-function(point,index){
-
-const x=
-point.x*canvas.width;
-
-const y=
-point.y*canvas.height;
-
-if(index===0){
-
-ctx.moveTo(x,y);
-
-}else{
-
-ctx.lineTo(x,y);
-
-}
-
-}
-);
-
-ctx.stroke();
-
-overlay.appendChild(canvas);
-
-}
-);
-
-
-s.texts.forEach(
-function(text){
-
-createText(
-text,
-overlay
-);
-
-}
-);
-
-
-s.images.forEach(
-function(image){
-
-createImage(
-image,
-overlay
-);
-
-}
-);
-
-}
-
-
-function createText(
-object,
-overlay
-){
-
-const element=
-document.createElement("div");
-
-element.className=
-"edit-item edit-text";
-
-element.textContent=
-object.text;
-
-element.style.left=
-(object.x*100)+"%";
-
-element.style.top=
-(object.y*100)+"%";
-
-element.style.fontSize=
-object.size+"px";
-
-element.style.zIndex="30";
-
-overlay.appendChild(element);
-
-makeMovable(
-element,
-object,
-overlay
-);
-
-return element;
-
-}
-
-
-function createImage(
-object,
-overlay
-){
-
-const wrapper=
-document.createElement("div");
-
-wrapper.className=
-"edit-item edit-image-wrap";
-
-wrapper.style.left=
-(object.x*100)+"%";
-
-wrapper.style.top=
-(object.y*100)+"%";
-
-wrapper.style.width=
-(object.w*100)+"%";
-
-wrapper.style.height=
-(object.h*100)+"%";
-
-wrapper.style.zIndex="30";
-
-
-const image=
-document.createElement("img");
-
-image.src=
-object.src;
-
-image.style.width="100%";
-
-image.style.height="100%";
-
-image.style.objectFit="contain";
-
-
-const handle=
-document.createElement("div");
-
-handle.className=
-"resize-handle";
-
-
-wrapper.appendChild(image);
-
-wrapper.appendChild(handle);
-
-overlay.appendChild(wrapper);
-
-
-makeMovable(
-wrapper,
-object,
-overlay
-);
-
-makeResizable(
-wrapper,
-object,
-overlay
-);
-
-return wrapper;
-
-}
-
-
-function makeMovable(
-element,
-object,
-overlay
-){
-
-element.addEventListener(
-"pointerdown",
-function(event){
-
-if(currentTool)
-return;
-
-event.preventDefault();
-
-event.stopPropagation();
-
-const rect=
-overlay.getBoundingClientRect();
-
-const startX=
-event.clientX;
-
-const startY=
-event.clientY;
-
-const oldX=
-object.x;
-
-const oldY=
-object.y;
-
-
-function move(e){
-
-object.x=
-Math.max(
-0,
-Math.min(
-.95,
-oldX+
-(e.clientX-startX)/
-rect.width
-)
-);
-
-object.y=
-Math.max(
-0,
-Math.min(
-.95,
-oldY+
-(e.clientY-startY)/
-rect.height
-)
-);
-
-element.style.left=
-(object.x*100)+"%";
-
-element.style.top=
-(object.y*100)+"%";
-
-}
-
-
-function up(){
-
-document.removeEventListener(
-"pointermove",
-move
-);
-
-document.removeEventListener(
-"pointerup",
-up
-);
-
-}
-
-
-document.addEventListener(
-"pointermove",
-move
-);
-
-document.addEventListener(
-"pointerup",
-up
-);
-
-}
-);
-
-}
-
-
-function makeResizable(
-element,
-object,
-overlay
-){
-
-const handle=
-element.querySelector(
-".resize-handle"
-);
-
-if(!handle)
-return;
-
-
-handle.addEventListener(
-"pointerdown",
-function(event){
-
-event.preventDefault();
-
-event.stopPropagation();
-
-const rect=
-overlay.getBoundingClientRect();
-
-const startX=
-event.clientX;
-
-const startY=
-event.clientY;
-
-const oldW=
-object.w;
-
-const oldH=
-object.h;
-
-
-function move(e){
-
-object.w=
-Math.max(
-.05,
-Math.min(
-.9,
-oldW+
-(e.clientX-startX)/
-rect.width
-)
-);
-
-object.h=
-Math.max(
-.05,
-Math.min(
-.9,
-oldH+
-(e.clientY-startY)/
-rect.height
-)
-);
-
-element.style.width=
-(object.w*100)+"%";
-
-element.style.height=
-(object.h*100)+"%";
-
+function drawPreview(page){
+  const overlay=page.querySelector(".annotationOverlay");
+  if(!overlay)return;
+  const canvas=overlay.querySelector(".annotationCanvas");
+  if(!canvas)return;
+
+  const ctx=canvas.getContext("2d");
+  const sx=canvas.width/page.clientWidth;
+  const sy=canvas.height/page.clientHeight;
+
+  restore(drawing.page);
+
+  const c=page.querySelector(".annotationOverlay .annotationCanvas");
+  const cx=c.getContext("2d");
+
+  cx.save();
+  cx.lineCap="round";
+  cx.lineJoin="round";
+  cx.lineWidth=drawing.width*Math.max(sx,sy);
+  cx.strokeStyle=drawing.color;
+  if(drawing.highlight){
+    cx.globalAlpha=.30;
+    cx.lineWidth=drawing.width*2.5*Math.max(sx,sy);
   }
-  function up(){
-
-document.removeEventListener(
-"pointermove",
-move
-);
-
-document.removeEventListener(
-"pointerup",
-up
-);
-
+  cx.beginPath();
+  cx.moveTo(drawing.points[0].x*sx,drawing.points[0].y*sy);
+  for(let i=1;i<drawing.points.length;i++){
+    cx.lineTo(drawing.points[i].x*sx,drawing.points[i].y*sy);
+  }
+  cx.stroke();
+  cx.restore();
 }
-
-
-document.addEventListener(
-"pointermove",
-move
-);
-
-document.addEventListener(
-"pointerup",
-up
-);
-
-}
-);
-
-}
-
 
 function selectTool(tool){
-
-currentTool=
-currentTool===tool
-?null
-:tool;
-
-$("pencilBtn")
-.classList.remove("active");
-
-$("highlightBtn")
-.classList.remove("active");
-
-
-if(currentTool==="pencil"){
-
-$("pencilBtn")
-.classList.add("active");
-
+  activeTool=activeTool===tool ? null : tool;
+  ["pencilBtn","highlightBtn"].forEach(id=>$(id).classList.remove("active"));
+  if(activeTool==="pencil")$("pencilBtn").classList.add("active");
+  if(activeTool==="highlight")$("highlightBtn").classList.add("active");
+  viewer.style.cursor=activeTool ? "crosshair" : "default";
 }
-
-
-if(currentTool==="highlight"){
-
-$("highlightBtn")
-.classList.add("active");
-
-}
-
-
-msg(
-currentTool
-?"Tool: "+currentTool
-:"Tool बंद है।"
-);
-
-}
-
 
 function addText(){
+  if(!pdfDocument)return toast("पहले PDF चुनें");
 
-if(!pdfDocument){
+  activeTool=null;
+  $("pencilBtn").classList.remove("active");
+  $("highlightBtn").classList.remove("active");
 
-alert(
-"पहले PDF चुनें।"
-);
+  const text=prompt("Text लिखें:");
+  if(!text)return;
 
-return;
+  const size=Math.max(8,Number($("textSize").value)||20);
+  const page=pdfViewer.getPageView(pdfViewer.currentPageNumber).div;
+  const n=pdfViewer.currentPageNumber;
+  saveHistory(n);
 
+  const p=getPageData(n);
+  p.texts.push({
+    text:text,
+    x:40,
+    y:60,
+    size:size,
+    color:"#111"
+  });
+
+  restore(n);
+  toast("Text add हो गया");
 }
-
-
-const text=
-prompt(
-"PDF में क्या text लिखना है?"
-);
-
-if(!text)
-return;
-
-
-const size=
-Number(
-prompt(
-"Text size (12/18/26/36)",
-"18"
-)
-)||18;
-
-
-const object={
-text:text,
-x:.10,
-y:.10,
-size:size
-};
-
-
-const s=
-state(currentPage);
-
-s.texts.push(object);
-
-history.push({
-page:currentPage,
-type:"text",
-object:object
-});
-
-
-restore(currentPage);
-
-}
-
 
 function addImage(file){
+  if(!pdfDocument)return toast("पहले PDF चुनें");
 
-if(!pdfDocument){
+  const reader=new FileReader();
 
-alert(
-"पहले PDF चुनें।"
-);
+  reader.onload=()=>{
+    const n=pdfViewer.currentPageNumber;
+    saveHistory(n);
 
-return;
+    const p=getPageData(n);
+    p.images.push({
+      src:reader.result,
+      x:40,
+      y:80,
+      w:180,
+      h:140
+    });
 
+    restore(n);
+    toast("Image add हो गई");
+  };
+
+  reader.readAsDataURL(file);
 }
-
-
-const reader=
-new FileReader();
-
-
-reader.onload=
-function(){
-
-const object={
-
-src:reader.result,
-
-x:.10,
-
-y:.10,
-
-w:.30,
-
-h:.20
-
-};
-
-
-state(currentPage)
-.images
-.push(object);
-
-
-history.push({
-
-page:currentPage,
-
-type:"image",
-
-object:object
-
-});
-
-
-restore(currentPage);
-
-toast(
-"Image जोड़ दी गई।"
-);
-
-};
-
-
-reader.readAsDataURL(file);
-
-}
-
 
 function undo(){
+  if(!pdfDocument)return;
+  const n=pdfViewer.currentPageNumber;
+  if(!history[n])return toast("Undo के लिए कुछ नहीं है");
 
-const item=
-history.pop();
-
-
-if(!item){
-
-toast(
-"Undo करने के लिए कुछ नहीं है।"
-);
-
-return;
-
+  pages[n]=history[n];
+  delete history[n];
+  restore(n);
+  toast("Undo");
 }
-
-
-const s=
-state(item.page);
-
-let array;
-
-
-if(item.type==="stroke"){
-
-array=s.strokes;
-
-}else if(item.type==="text"){
-
-array=s.texts;
-
-}else{
-
-array=s.images;
-
-}
-
-
-const index=
-array.indexOf(
-item.object
-);
-
-
-if(index!==-1){
-
-array.splice(
-index,
-1
-);
-
-}
-
-
-restore(item.page);
-
-}
-
 
 function clearPage(){
+  if(!pdfDocument)return;
+  const n=pdfViewer.currentPageNumber;
+  const p=getPageData(n);
+  if(!p.drawings.length && !p.texts.length && !p.images.length)
+    return toast("इस page पर annotation नहीं है");
 
-if(!pdfDocument)
-return;
-
-
-const s=
-state(currentPage);
-
-s.strokes=[];
-
-s.texts=[];
-
-s.images=[];
-
-
-history=
-history.filter(
-item=>
-item.page!==currentPage
-);
-
-
-restore(currentPage);
-
-toast(
-"इस page की editing clear हो गई।"
-);
-
+  saveHistory(n);
+  pages[n]={drawings:[],texts:[],images:[]};
+  restore(n);
+  toast("Current page साफ हो गया");
 }
 
+async function loadPDF(file){
+  if(!file || file.type!=="application/pdf"){
+    toast("सिर्फ PDF file चुनें");
+    return;
+  }
+
+  try{
+    toast("PDF load हो रही है...");
+
+    currentFile=file;
+    pdfBytes=new Uint8Array(await file.arrayBuffer());
+
+    pages={};
+    history={};
+
+    const task=pdfjsLib.getDocument({
+      data:pdfBytes,
+      disableAutoFetch:false,
+      disableStream:false
+    });
+
+    pdfDocument=await task.promise;
+
+    pdfViewer.setDocument(pdfDocument);
+    linkService.setDocument(pdfDocument,null);
+
+    $("pageCount").textContent=pdfDocument.numPages;
+    $("pageInput").value=1;
+    $("empty").style.display="none";
+
+    toast("PDF तैयार है");
+  }catch(err){
+    console.error(err);
+    toast("PDF load नहीं हुई");
+    alert("PDF load नहीं हो पाई। File सही PDF है या नहीं check करें।");
+  }
+}
 
 async function downloadPDF(){
+  if(!pdfDocument || !pdfBytes){
+    toast("पहले PDF चुनें");
+    return;
+  }
 
-if(!pdfBytes){
+  try{
+    toast("PDF तैयार हो रही है...");
 
-alert(
-"पहले PDF चुनें।"
-);
+    const pdfDoc=await PDFLib.PDFDocument.load(pdfBytes);
+    const font=await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
 
-return;
+    for(let n=1;n<=pdfDoc.getPageCount();n++){
+      const page=pdfDoc.getPage(n-1);
+      const view=pdfViewer.getPageView(n-1);
+      const scale=view?view.scale:1;
+      const width=view?view.viewport.width/scale:page.getWidth();
+      const height=view?view.viewport.height/scale:page.getHeight();
 
+      const p=pages[n];
+      if(!p)continue;
+
+      const sx=page.getWidth()/width;
+      const sy=page.getHeight()/height;
+
+      for(const d of p.drawings){
+        if(!d.points || d.points.length<2)continue;
+
+        const rgb=d.highlight
+          ? PDFLib.rgb(1,1,0)
+          : PDFLib.rgb(0.82,0.05,0.05);
+
+        for(let i=1;i<d.points.length;i++){
+          const a=d.points[i-1];
+          const b=d.points[i];
+
+          page.drawLine({
+            start:{x:a.x*sx,y:page.getHeight()-a.y*sy},
+            end:{x:b.x*sx,y:page.getHeight()-b.y*sy},
+            thickness:d.width*Math.max(sx,sy)*(d.highlight?2.5:1),
+            color:rgb,
+            opacity:d.highlight?.3:1
+          });
+        }
+      }
+
+      for(const t of p.texts){
+        page.drawText(t.text,{
+          x:t.x*sx,
+          y:page.getHeight()-(t.y+t.size)*sy,
+          size:t.size*Math.max(sx,sy),
+          font:font,
+          color:PDFLib.rgb(0.05,0.05,0.05)
+        });
+      }
+
+      for(const im of p.images){
+        try{
+          const bytes=await fetch(im.src).then(r=>r.arrayBuffer());
+          let embedded;
+          if(im.src.startsWith("data:image/png")){
+            embedded=await pdfDoc.embedPng(bytes);
+          }else{
+            embedded=await pdfDoc.embedJpg(bytes);
+          }
+
+          page.drawImage(embedded,{
+            x:im.x*sx,
+            y:page.getHeight()-(im.y+im.h)*sy,
+            width:im.w*sx,
+            height:im.h*sy
+          });
+        }catch(e){
+          console.warn("Image export failed",e);
+        }
+      }
+    }
+
+    const out=await pdfDoc.save();
+    const blob=new Blob([out],{type:"application/pdf"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=(currentFile.name.replace(/\.pdf$/i,"")||"edited")+"_edited.pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),3000);
+
+    toast("PDF download हो गई");
+  }catch(err){
+    console.error(err);
+    toast("Download में error आया");
+    alert("Edited PDF बनाते समय error आया।");
+  }
 }
 
-
-try{
-
-msg(
-"Edited PDF तैयार हो रही है..."
-);
-
-
-const doc=
-await PDFLib.PDFDocument.load(
-pdfBytes
-);
-
-
-const pdfPages=
-doc.getPages();
-
-
-for(
-let n=1;
-n<=pdfPages.length;
-n++
-){
-
-const s=pages[n];
-
-if(!s)
-continue;
-
-
-const pdfPage=
-pdfPages[n-1];
-
-const W=
-pdfPage.getWidth();
-
-const H=
-pdfPage.getHeight();
-
-
-for(
-const stroke of s.strokes
-){
-
-if(
-stroke.points.length<2
-)
-continue;
-
-
-for(
-let i=1;
-i<stroke.points.length;
-i++
-){
-
-const a=
-stroke.points[i-1];
-
-const b=
-stroke.points[i];
-
-
-pdfPage.drawLine({
-
-start:{
-x:a.x*W,
-y:H-a.y*H
-},
-
-end:{
-x:b.x*W,
-y:H-b.y*H
-},
-
-thickness:
-stroke.type==="highlight"
-?12
-:2.5,
-
-color:
-stroke.type==="highlight"
-?
-PDFLib.rgb(1,.9,0)
-:
-PDFLib.rgb(.05,.05,.05),
-
-opacity:
-stroke.type==="highlight"
-?.35
-:1
-
+$("pdfInput").addEventListener("change",e=>{
+  const f=e.target.files[0];
+  if(f)loadPDF(f);
+  e.target.value="";
 });
 
-}
+$("imageInput").addEventListener("change",e=>{
+  const f=e.target.files[0];
+  if(f)addImage(f);
+  e.target.value="";
+});
 
-}
+$("pencilBtn").onclick=()=>selectTool("pencil");
+$("highlightBtn").onclick=()=>selectTool("highlight");
+$("textBtn").onclick=()=>addText();
+$("imageInput").onchange=e=>{
+  const f=e.target.files[0];
+  if(f)addImage(f);
+  e.target.value="";
+};
+$("undoBtn").onclick=()=>undo();
+$("clearBtn").onclick=()=>clearPage();
+$("downloadBtn").onclick=()=>downloadPDF();
 
+$("prevBtn").onclick=()=>{
+  if(!pdfDocument)return;
+  pdfViewer.currentPageNumber=Math.max(1,pdfViewer.currentPageNumber-1);
+};
 
-for(
-const text of s.texts
-){
+$("nextBtn").onclick=()=>{
+  if(!pdfDocument)return;
+  pdfViewer.currentPageNumber=Math.min(
+    pdfDocument.numPages,
+    pdfViewer.currentPageNumber+1
+  );
+};
 
-pdfPage.drawText(
-text.text,
-{
+$("pageInput").addEventListener("change",()=>{
+  if(!pdfDocument)return;
+  let n=Number($("pageInput").value)||1;
+  n=Math.max(1,Math.min(pdfDocument.numPages,n));
+  pdfViewer.currentPageNumber=n;
+});
 
-x:text.x*W,
+$("zoomInBtn").onclick=()=>{
+  if(pdfDocument)pdfViewer.zoomIn();
+};
 
-y:
-H-
-text.y*H-
-text.size,
+$("zoomOutBtn").onclick=()=>{
+  if(pdfDocument)pdfViewer.zoomOut();
+};
 
-size:text.size,
+$("fitBtn").onclick=()=>{
+  if(pdfDocument)pdfViewer.currentScaleValue="page-width";
+};
 
-color:
-PDFLib.rgb(0,0,0)
+$("searchBtn").onclick=()=>{
+  if(!pdfDocument)return;
+  const q=prompt("PDF में क्या खोजें?");
+  if(!q)return;
+  const event=new CustomEvent("find",{
+    detail:{
+      query:q,
+      phraseSearch:true,
+      caseSensitive:false,
+      highlightAll:true,
+      findPrevious:false
+    }
+  });
+  eventBus.dispatch(event);
+};
 
-}
-);
-
+$("sideBtn").onclick=()=>{
+  const sidebar=document.querySelector(".sidebarContainer");
+  if(sidebar){
+    sidebar.classList.toggle("sidebarOpen");
+  }else{
+    toast("Sidebar इस version में उपलब्ध नहीं है");
   }
-  for(
-const image of s.images
-){
+};
 
-try{
+$("closeBtn").onclick=()=>{
+  location.href="../index.html";
+};
 
-const bytes=
-await fetch(
-image.src
-)
-.then(
-response=>
-response.arrayBuffer()
-);
+viewer.addEventListener("pointerdown",drawStart);
+viewer.addEventListener("pointermove",drawMove);
+window.addEventListener("pointerup",drawEnd);
 
+eventBus.on("pagechanging",e=>{
+  $("pageInput").value=e.pageNumber;
+});
 
-let embedded;
-
-
-if(
-image.src.startsWith(
-"data:image/png"
-)
-){
-
-embedded=
-await doc.embedPng(
-bytes
-);
-
-}else{
-
-embedded=
-await doc.embedJpg(
-bytes
-);
-
-}
-
-
-pdfPage.drawImage(
-embedded,
-{
-
-x:image.x*W,
-
-y:
-H-
-image.y*H-
-image.h*H,
-
-width:
-image.w*W,
-
-height:
-image.h*H
-
-}
-);
-
-
-}catch(error){
-
-console.error(
-"Image export error:",
-error
-);
-
-}
-
-}
-
-}
-
-
-const output=
-await doc.save();
-
-
-const blob=
-new Blob(
-[output],
-{
-type:"application/pdf"
-}
-);
-
-
-const url=
-URL.createObjectURL(
-blob
-);
-
-
-const link=
-document.createElement("a");
-
-
-link.href=url;
-
-link.download=
-"SSODAYS-Edited.pdf";
-
-
-document.body.appendChild(link);
-
-link.click();
-
-link.remove();
-
-
-setTimeout(
-function(){
-
-URL.revokeObjectURL(url);
-
-},
-1000
-);
-
-
-msg(
-"✅ PDF download हो गई।"
-);
-
-toast(
-"PDF download हो गई।"
-);
-
-
-}catch(error){
-
-console.error(error);
-
-msg(
-"❌ PDF export में error आया।"
-);
-
-alert(
-"PDF export नहीं हो पाई।"
-);
-
-}
-
+eventBus.on("pagesinit",()=>{
+  if(pdfDocument){
+    pdfViewer.currentScaleValue="page-width";
   }
-  $("pdfInput").addEventListener(
-"change",
-function(event){
-
-const file =
-event.target.files[0];
-
-if(file){
-
-loadPDF(file);
-
-}
-
-event.target.value="";
-
-}
-);
-
-
-$("welcomeInput").addEventListener(
-"change",
-function(event){
-
-const file =
-event.target.files[0];
-
-if(file){
-
-loadPDF(file);
-
-}
-
-event.target.value="";
-
-}
-);
-
-
-$("imageInput").addEventListener(
-"change",
-function(event){
-
-const file =
-event.target.files[0];
-
-if(file){
-
-addImage(file);
-
-}
-
-event.target.value="";
-
-}
-);
-
-
-$("pencilBtn").onclick =
-function(){
-
-selectTool("pencil");
-
-};
-
-
-$("highlightBtn").onclick =
-function(){
-
-selectTool("highlight");
-
-};
-
-
-$("textBtn").onclick =
-function(){
-
-addText();
-
-};
-
-
-$("undoBtn").onclick =
-function(){
-
-undo();
-
-};
-
-
-$("clearBtn").onclick =
-function(){
-
-clearPage();
-
-};
-
-
-$("downloadBtn").onclick =
-function(){
-
-downloadPDF();
-
-};
-
-
-$("prevBtn").onclick =
-function(){
-
-if(!pdfDocument)
-return;
-
-pdfViewer.currentPageNumber =
-Math.max(
-1,
-pdfViewer.currentPageNumber-1
-);
-
-};
-
-
-$("nextBtn").onclick =
-function(){
-
-if(!pdfDocument)
-return;
-
-pdfViewer.currentPageNumber =
-Math.min(
-pdfDocument.numPages,
-pdfViewer.currentPageNumber+1
-);
-
-};
-
-
-pageNumber.addEventListener(
-"change",
-function(){
-
-if(!pdfDocument)
-return;
-
-let number =
-Number(pageNumber.value)||1;
-
-number =
-Math.max(
-1,
-Math.min(
-pdfDocument.numPages,
-number
-)
-);
-
-pdfViewer.currentPageNumber =
-number;
-
-}
-);
-
-
-/*
-PDF.js का अपना zoom इस्तेमाल किया गया है।
-इससे browser/page zoom के बजाय
-PDF को proper scale पर render किया जाएगा।
-*/
-
-$("zoomInBtn").onclick =
-function(){
-
-if(!pdfDocument)
-return;
-
-pdfViewer.zoomIn();
-
-};
-
-
-$("zoomOutBtn").onclick =
-function(){
-
-if(!pdfDocument)
-return;
-
-pdfViewer.zoomOut();
-
-};
-
-
-$("fitBtn").onclick =
-function(){
-
-if(!pdfDocument)
-return;
-
-pdfViewer.currentScaleValue =
-"page-width";
-
-};
-
-
-$("closeBtn").onclick =
-function(){
-
-location.href =
-"../index.html";
-
-};
-
-
-window.addEventListener(
-"resize",
-function(){
-
-setTimeout(
-function(){
-
-prepare();
-
-for(
-const n in pages
-){
-
-restore(
-Number(n)
-);
-
-}
-
-},
-200
-);
-
-}
-);
-
+});
+
+eventBus.on("pagerendered",e=>{
+  setTimeout(()=>restore(e.pageNumber),50);
+});
+
+eventBus.on("scalechanging",()=>{
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(()=>{
+    Object.keys(pages).forEach(n=>restore(Number(n)));
+  },150);
+});
+
+window.addEventListener("resize",()=>{
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(()=>{
+    Object.keys(pages).forEach(n=>restore(Number(n)));
+  },200);
+});
 </script>
 
 </body>
-
 </html>
