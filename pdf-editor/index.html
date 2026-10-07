@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>SSODAYS - PDF Editor</title>
+
+<!-- PDF.js -->
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf_viewer.min.css"
+>
+
+<link
+    rel="stylesheet"
+    href="style.css"
+>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= HEADER ================= -->
+
+<header>
+
+    <h1>📄 PDF Editor</h1>
+
+    <p>
+        Edit PDF • Text • Pencil • Highlight • Image
+    </p>
+
+</header>
+
+
+<!-- ================= TOOLBAR ================= -->
+
+<div class="toolbar">
+
+    <label
+        class="tool-btn upload-btn"
+        for="pdfInput"
+    >
+        📤 PDF
+    </label>
+
+    <input
+        type="file"
+        id="pdfInput"
+        accept="application/pdf"
+        hidden
+    >
+
+
+    <button
+        class="tool-btn"
+        id="pencilBtn"
+        type="button"
+    >
+        ✏️ Pencil
+    </button>
+
+
+    <button
+        class="tool-btn"
+        id="highlightBtn"
+        type="button"
+    >
+        🖍️ Highlight
+    </button>
+
+
+    <button
+        class="tool-btn"
+        id="textBtn"
+        type="button"
+    >
+        T Text
+    </button>
+
+
+    <select
+        id="textSize"
+        class="tool-select"
+    >
+
+        <option value="10">10</option>
+        <option value="12">12</option>
+        <option value="14">14</option>
+        <option value="16" selected>16</option>
+        <option value="18">18</option>
+        <option value="20">20</option>
+        <option value="24">24</option>
+        <option value="28">28</option>
+        <option value="32">32</option>
+        <option value="40">40</option>
+        <option value="48">48</option>
+        <option value="60">60</option>
+        <option value="72">72</option>
+
+    </select>
+
+
+    <label
+        class="tool-btn"
+        for="imageInput"
+    >
+        🖼️ Image
+    </label>
+
+    <input
+        type="file"
+        id="imageInput"
+        accept="image/*"
+        hidden
+    >
+
+
+    <button
+        class="tool-btn"
+        id="undoBtn"
+        type="button"
+    >
+        ↩️ Undo
+    </button>
+
+
+    <button
+        class="tool-btn danger"
+        id="deleteBtn"
+        type="button"
+    >
+        🗑️ Delete
+    </button>
+
+
+    <button
+        class="tool-btn"
+        id="zoomOutBtn"
+        type="button"
+    >
+        🔍 −
+    </button>
+
+
+    <button
+        class="tool-btn"
+        id="zoomInBtn"
+        type="button"
+    >
+        🔍 +
+    </button>
+
+
+    <button
+        class="tool-btn download-btn"
+        id="downloadBtn"
+        type="button"
+    >
+        ⬇️ Download
+    </button>
+
+</div>
+
+
+<!-- ================= STATUS ================= -->
+
+<div
+    id="status"
+    class="status"
+>
+    📤 PDF चुनें
+</div>
+
+
+<!-- ================= PDF AREA ================= -->
+
+<div
+    id="pdfArea"
+    class="pdf-area"
+>
+
+
+    <div
+        id="welcome"
+        class="welcome"
+    >
+
+        <div class="welcome-icon">
+            📄
+        </div>
+
+        <h2>
+            PDF Editor
+        </h2>
+
+        <p>
+            अपनी PDF चुनें और यहीं edit करें।
+        </p>
+
+        <label
+            class="main-upload-btn"
+            for="pdfInput"
+        >
+            📤 Choose PDF
+        </label>
+
+    </div>
+
+
+    <!-- PDF pages will be added here -->
+
+    <div
+        id="pdfContainer"
+        class="pdf-container"
+    >
+    </div>
+
+
+</div>
+
+
+<!-- ================= TEXT INPUT POPUP ================= -->
+
+<div
+    id="textPopup"
+    class="popup"
+    style="display:none;"
+>
+
+    <div class="popup-box">
+
+        <h3>
+            T Text
+        </h3>
+
+
+        <textarea
+            id="textInput"
+            placeholder="यहाँ अपना text लिखें..."
+        ></textarea>
+
+
+        <div class="popup-row">
+
+            <button
+                class="tool-btn"
+                id="addTextBtn"
+                type="button"
+            >
+                ✅ Add Text
+            </button>
+
+
+            <button
+                class="tool-btn danger"
+                id="cancelTextBtn"
+                type="button"
+            >
+                ✕ Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <a
+        href="../index.html"
+        class="back-btn"
+    >
+        ← Back to SSODAYS
+    </a>
+
+    <br><br>
+
+    © 2026 SSODAYS • All Rights Reserved
+
+</footer>
+
+
+<!-- ================= LIBRARIES ================= -->
+
+<!-- PDF.js -->
+
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs"
+    type="module">
+</script>
+
+
+<!-- pdf-lib -->
+
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js">
+</script>
+
+
+<!-- Fabric.js -->
+
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js">
+</script>
+
+
+<!-- Our Script -->
+
+<script
+    src="script.js">
+</script>
+
+
+</body>
+
+  </html>
