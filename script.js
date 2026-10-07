@@ -16,6 +16,8 @@ function showSection(id, button){
 }
 
 
+/* ================= PDF SYSTEM ================= */
+
 async function loadPDFs(){
 
     const pdfList = document.getElementById("pdfList");
@@ -34,7 +36,8 @@ async function loadPDFs(){
         );
 
         if(pdfs.length === 0){
-            pdfList.innerHTML = "<p>अभी कोई PDF उपलब्ध नहीं है।</p>";
+            pdfList.innerHTML =
+                "<p>अभी कोई PDF उपलब्ध नहीं है।</p>";
             return;
         }
 
@@ -49,7 +52,9 @@ async function loadPDFs(){
             item.className = "pdf-item";
 
             item.innerHTML = `
-                <div class="pdf-title">📄 ${file.name}</div>
+                <div class="pdf-title">
+                    📄 ${file.name}
+                </div>
 
                 <button class="btn"
                     onclick="openPDF('${pdfURL}')">
@@ -76,10 +81,14 @@ async function loadPDFs(){
 
 function openPDF(url){
 
-    const viewer = document.getElementById("pdfViewer");
-    const frame = document.getElementById("pdfFrame");
+    const viewer =
+        document.getElementById("pdfViewer");
 
-    const fullURL = new URL(url, window.location.href).href;
+    const frame =
+        document.getElementById("pdfFrame");
+
+    const fullURL =
+        new URL(url, window.location.href).href;
 
     frame.src =
         "https://mozilla.github.io/pdf.js/web/viewer.html?file=" +
@@ -91,463 +100,965 @@ function openPDF(url){
 
 function closePDF(){
 
-    const viewer = document.getElementById("pdfViewer");
-    const frame = document.getElementById("pdfFrame");
+    const viewer =
+        document.getElementById("pdfViewer");
+
+    const frame =
+        document.getElementById("pdfFrame");
 
     frame.src = "";
+
     viewer.style.display = "none";
 }
 
 
 loadPDFs();
-/* ================= IMAGE TOOLS ================= */
+
+
+/* ================================================= */
+/* ================= IMAGE TOOLS ==================== */
+/* ================================================= */
 
 (function(){
 
-const toolsSection = document.getElementById("tools");
+    const toolsSection =
+        document.getElementById("tools");
 
-if(!toolsSection) return;
-
-const card = toolsSection.querySelector(".card");
-
-card.insertAdjacentHTML("beforeend", `
-<div class="tool-box">
-
-    <input type="file" id="imageInput"
-        class="tool-input"
-        accept="image/*">
-
-    <div id="imageArea" class="image-preview"></div>
-
-    <div class="tool-row">
-        <button class="btn" id="cropBtn">✂️ Crop</button>
-        <button class="btn" id="applyCropBtn" style="display:none">
-            ✅ Apply Crop
-        </button>
-    </div>
-
-    <div class="tool-row">
-        <input type="number"
-            id="imageWidth"
-            placeholder="Width (px)"
-            min="1">
-
-        <input type="number"
-            id="imageHeight"
-            placeholder="Height (px)"
-            min="1">
-    </div>
-
-    <div class="tool-row">
-        <select id="imageFormat">
-            <option value="image/jpeg">JPG</option>
-            <option value="image/webp">WEBP</option>
-            <option value="image/png">PNG</option>
-        </select>
-
-        <input type="number"
-            id="targetKB"
-            placeholder="Target KB"
-            min="1">
-    </div>
-
-    <div class="tool-row">
-        <button class="btn" id="processImageBtn">
-            🔄 Resize / Convert
-        </button>
-    </div>
-
-    <div id="toolStatus" style="margin-top:12px;"></div>
-
-    <div id="toolResult" class="tool-result"></div>
-
-</div>
-`);
+    if(!toolsSection) return;
 
 
-const input = document.getElementById("imageInput");
-const imageArea = document.getElementById("imageArea");
-const cropBtn = document.getElementById("cropBtn");
-const applyCropBtn = document.getElementById("applyCropBtn");
-const widthInput = document.getElementById("imageWidth");
-const heightInput = document.getElementById("imageHeight");
-const formatInput = document.getElementById("imageFormat");
-const targetKBInput = document.getElementById("targetKB");
-const processBtn = document.getElementById("processImageBtn");
-const status = document.getElementById("toolStatus");
-const result = document.getElementById("toolResult");
-
-let canvas = null;
-let cropBox = null;
-let cropArea = null;
-let cropMode = false;
-let startX = 0;
-let startY = 0;
-let selecting = false;
-let currentObjectURL = null;
+    const card =
+        toolsSection.querySelector(".card");
 
 
-/* PHOTO SELECT */
+    /* TOOL HTML */
 
-input.addEventListener("change", function(){
+    card.insertAdjacentHTML("beforeend", `
 
-    const file = this.files[0];
+        <div class="tool-box">
 
-    if(!file) return;
+            <input
+                type="file"
+                id="imageInput"
+                class="tool-input"
+                accept="image/*"
+            >
 
-    if(!file.type.startsWith("image/")){
-        status.innerText = "कृपया image file चुनें।";
-        return;
-    }
 
-    const img = new Image();
+            <div
+                id="imageEditor"
+                style="display:none;"
+            >
 
-    img.onload = function(){
+                <div class="image-editor-area">
 
-        imageArea.innerHTML = `
-            <div class="crop-area" id="cropArea">
-                <canvas id="imageCanvas"></canvas>
-                <div class="crop-box" id="cropBox"></div>
+                    <img
+                        id="editImage"
+                        alt="Selected Image"
+                    >
+
+                </div>
+
+
+                <div class="rotate-controls">
+
+                    <button
+                        class="btn"
+                        type="button"
+                        id="rotateLeftBtn">
+                        ↶ -1°
+                    </button>
+
+
+                    <input
+                        type="range"
+                        id="rotateSlider"
+                        min="-180"
+                        max="180"
+                        value="0"
+                        step="1"
+                    >
+
+
+                    <button
+                        class="btn"
+                        type="button"
+                        id="rotateRightBtn">
+                        ↷ +1°
+                    </button>
+
+                </div>
+
+
+                <div class="rotate-value">
+
+                    Rotation:
+                    <span id="rotateValue">0</span>°
+
+                </div>
+
+
+                <div class="zoom-controls">
+
+                    <button
+                        class="btn"
+                        type="button"
+                        id="zoomOutBtn">
+                        🔍 −
+                    </button>
+
+
+                    <button
+                        class="btn"
+                        type="button"
+                        id="zoomInBtn">
+                        🔍 +
+                    </button>
+
+
+                    <button
+                        class="btn"
+                        type="button"
+                        id="resetEditorBtn">
+                        🔄 Reset
+                    </button>
+
+                </div>
+
+
+                <div class="tool-row">
+
+                    <button
+                        class="btn"
+                        type="button"
+                        id="applyCropBtn">
+                        ✂️ Apply Crop
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="tool-row"
+                    id="resizeControls"
+                    style="display:none;"
+                >
+
+                    <input
+                        type="number"
+                        id="imageWidth"
+                        placeholder="Width (px)"
+                        min="1"
+                    >
+
+
+                    <input
+                        type="number"
+                        id="imageHeight"
+                        placeholder="Height (px)"
+                        min="1"
+                    >
+
+                </div>
+
+
+                <div
+                    class="tool-row"
+                    id="convertControls"
+                    style="display:none;"
+                >
+
+                    <select id="imageFormat">
+
+                        <option value="image/jpeg">
+                            JPG
+                        </option>
+
+                        <option value="image/webp">
+                            WEBP
+                        </option>
+
+                        <option value="image/png">
+                            PNG
+                        </option>
+
+                    </select>
+
+
+                    <input
+                        type="number"
+                        id="targetKB"
+                        placeholder="Target KB"
+                        min="1"
+                    >
+
+                </div>
+
+
+                <div
+                    class="tool-row"
+                    id="processControls"
+                    style="display:none;"
+                >
+
+                    <button
+                        class="btn"
+                        type="button"
+                        id="processImageBtn">
+                        🔄 Resize / Convert
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="toolStatus"
+                    style="margin-top:12px;">
+                </div>
+
+
+                <div
+                    id="toolResult"
+                    class="tool-result">
+                </div>
+
             </div>
-        `;
 
-        cropArea = document.getElementById("cropArea");
-        canvas = document.getElementById("imageCanvas");
-        cropBox = document.getElementById("cropBox");
+        </div>
 
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
+    `);
 
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img,0,0);
 
-        widthInput.value = img.naturalWidth;
-        heightInput.value = img.naturalHeight;
+    /* ================= ELEMENTS ================= */
 
-        status.innerText =
-            "Original: " +
-            img.naturalWidth + " × " +
-            img.naturalHeight + " px | " +
-            Math.round(file.size/1024) + " KB";
+    const input =
+        document.getElementById("imageInput");
+
+    const editor =
+        document.getElementById("imageEditor");
+
+    const image =
+        document.getElementById("editImage");
+
+    const rotateLeftBtn =
+        document.getElementById("rotateLeftBtn");
+
+    const rotateRightBtn =
+        document.getElementById("rotateRightBtn");
+
+    const rotateSlider =
+        document.getElementById("rotateSlider");
+
+    const rotateValue =
+        document.getElementById("rotateValue");
+
+    const zoomInBtn =
+        document.getElementById("zoomInBtn");
+
+    const zoomOutBtn =
+        document.getElementById("zoomOutBtn");
+
+    const resetEditorBtn =
+        document.getElementById("resetEditorBtn");
+
+    const applyCropBtn =
+        document.getElementById("applyCropBtn");
+
+    const resizeControls =
+        document.getElementById("resizeControls");
+
+    const convertControls =
+        document.getElementById("convertControls");
+
+    const processControls =
+        document.getElementById("processControls");
+
+    const widthInput =
+        document.getElementById("imageWidth");
+
+    const heightInput =
+        document.getElementById("imageHeight");
+
+    const formatInput =
+        document.getElementById("imageFormat");
+
+    const targetKBInput =
+        document.getElementById("targetKB");
+
+    const processBtn =
+        document.getElementById("processImageBtn");
+
+    const status =
+        document.getElementById("toolStatus");
+
+    const result =
+        document.getElementById("toolResult");
+
+
+    let cropper = null;
+
+    let currentRotation = 0;
+
+    let currentObjectURL = null;
+
+
+    /* ================= PHOTO SELECT ================= */
+
+    input.addEventListener("change", function(){
+
+        const file =
+            this.files[0];
+
+        if(!file) return;
+
+
+        if(!file.type.startsWith("image/")){
+
+            status.innerText =
+                "कृपया image file चुनें।";
+
+            return;
+        }
+
+
+        if(cropper){
+
+            cropper.destroy();
+
+            cropper = null;
+        }
+
+
+        if(currentObjectURL){
+
+            URL.revokeObjectURL(
+                currentObjectURL
+            );
+
+        }
+
+
+        currentObjectURL =
+            URL.createObjectURL(file);
+
+
+        image.src =
+            currentObjectURL;
+
+
+        editor.style.display =
+            "block";
+
+
+        resizeControls.style.display =
+            "none";
+
+        convertControls.style.display =
+            "none";
+
+        processControls.style.display =
+            "none";
+
 
         result.innerHTML = "";
 
-        cropMode = false;
-        cropBox.style.display = "none";
-        applyCropBtn.style.display = "none";
-    };
 
-    img.src = URL.createObjectURL(file);
-});
+        currentRotation = 0;
 
+        rotateSlider.value = 0;
 
-/* CROP BUTTON */
+        rotateValue.innerText = "0";
 
-cropBtn.addEventListener("click", function(){
 
-    if(!canvas){
-        status.innerText = "पहले photo चुनें।";
-        return;
-    }
+        image.onload = function(){
 
-    cropMode = true;
-    cropBox.style.display = "block";
-    cropBox.style.left = "0px";
-    cropBox.style.top = "0px";
-    cropBox.style.width = "0px";
-    cropBox.style.height = "0px";
+            cropper =
+                new Cropper(image, {
 
-    applyCropBtn.style.display = "inline-block";
+                    viewMode: 1,
 
-    status.innerText =
-        "Photo पर उंगली से drag करके crop area चुनें।";
-});
+                    dragMode: "move",
 
+                    autoCrop: true,
 
-/* CROP SELECTION */
+                    responsive: true,
 
-imageArea.addEventListener("pointerdown", function(e){
-    if(!cropMode) return;
+                    restore: true,
 
-    const rect = canvas.getBoundingClientRect();
+                    guides: true,
 
-    startX = e.clientX - rect.left;
-    startY = e.clientY - rect.top;
+                    center: true,
 
-    selecting = true;
+                    highlight: true,
 
-    cropBox.style.left = startX + "px";
-    cropBox.style.top = startY + "px";
-    cropBox.style.width = "0px";
-    cropBox.style.height = "0px";
+                    cropBoxMovable: true,
 
-    imageArea.setPointerCapture(e.pointerId);
-});
+                    cropBoxResizable: true,
 
+                    toggleDragModeOnDblclick: false,
 
-imageArea.addEventListener("pointermove", function(e){
+                    zoomOnWheel: true,
 
-    if(!selecting || !cropMode) return;
+                    zoomOnTouch: true,
 
-    const rect = canvas.getBoundingClientRect();
+                    background: false,
 
-    let currentX = e.clientX - rect.left;
-    let currentY = e.clientY - rect.top;
+                    aspectRatio: NaN,
 
-    currentX = Math.max(0, Math.min(currentX, rect.width));
-    currentY = Math.max(0, Math.min(currentY, rect.height));
+                    ready: function(){
 
-    const left = Math.min(startX,currentX);
-    const top = Math.min(startY,currentY);
+                        status.innerText =
+                            "Photo तैयार है। Crop box को adjust करें, zoom/move करें या rotate करें।";
 
-    const width = Math.abs(currentX-startX);
-    const height = Math.abs(currentY-startY);
+                    }
 
-    cropBox.style.left = left + "px";
-    cropBox.style.top = top + "px";
-    cropBox.style.width = width + "px";
-    cropBox.style.height = height + "px";
-});
+                });
 
-
-imageArea.addEventListener("pointerup", function(){
-
-    selecting = false;
-
-});
-
-
-/* APPLY CROP */
-
-applyCropBtn.addEventListener("click", function(){
-
-    if(!canvas) return;
-
-    const box = cropBox.getBoundingClientRect();
-    const rect = canvas.getBoundingClientRect();
-
-    const displayX = box.left - rect.left;
-    const displayY = box.top - rect.top;
-
-    const displayW = box.width;
-    const displayH = box.height;
-
-    if(displayW < 10 || displayH < 10){
-        status.innerText = "पहले crop area select करें।";
-        return;
-    }
-
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-
-    const sx = displayX * scaleX;
-    const sy = displayY * scaleY;
-    const sw = displayW * scaleX;
-    const sh = displayH * scaleY;
-
-    const newCanvas = document.createElement("canvas");
-
-    newCanvas.width = Math.round(sw);
-    newCanvas.height = Math.round(sh);
-
-    const ctx = newCanvas.getContext("2d");
-
-    ctx.drawImage(
-        canvas,
-        sx,sy,sw,sh,
-        0,0,newCanvas.width,newCanvas.height
-    );
-
-    canvas = newCanvas;
-
-    imageArea.innerHTML = `
-        <div class="crop-area" id="cropArea">
-            <canvas id="imageCanvas"></canvas>
-            <div class="crop-box" id="cropBox"></div>
-        </div>
-    `;
-
-    cropArea = document.getElementById("cropArea");
-    const newCanvasElement = document.getElementById("imageCanvas");
-
-    newCanvasElement.width = canvas.width;
-    newCanvasElement.height = canvas.height;
-
-    newCanvasElement
-        .getContext("2d")
-        .drawImage(canvas,0,0);
-
-    canvas = newCanvasElement;
-    cropBox = document.getElementById("cropBox");
-
-    widthInput.value = canvas.width;
-    heightInput.value = canvas.height;
-
-    cropMode = false;
-    cropBox.style.display = "none";
-    applyCropBtn.style.display = "none";
-
-    status.innerText =
-        "Crop complete: " +
-        canvas.width + " × " +
-        canvas.height + " px";
-});
-
-
-/* RESIZE + KB CONVERT */
-
-processBtn.addEventListener("click", async function(){
-
-    if(!canvas){
-        status.innerText = "पहले photo चुनें।";
-        return;
-    }
-
-    let width = parseInt(widthInput.value);
-    let height = parseInt(heightInput.value);
-
-    if(!width || !height){
-        width = canvas.width;
-        height = canvas.height;
-    }
-
-    const format = formatInput.value;
-    const targetKB = parseFloat(targetKBInput.value);
-
-    if(format === "image/png" && targetKB){
-        status.innerText =
-            "PNG में exact KB compression संभव नहीं है। JPG या WEBP चुनें।";
-        return;
-    }
-
-    let outCanvas = document.createElement("canvas");
-
-    outCanvas.width = width;
-    outCanvas.height = height;
-
-    let ctx = outCanvas.getContext("2d");
-
-    if(format === "image/jpeg"){
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0,0,width,height);
-    }
-
-    ctx.drawImage(canvas,0,0,width,height);
-
-    let blob;
-
-    if(targetKB && (format === "image/jpeg" || format === "image/webp")){
-
-        let quality = 0.9;
-
-        blob = await canvasToBlob(
-            outCanvas,
-            format,
-            quality
-        );
-
-        for(let i=0;i<12 && blob.size > targetKB*1024;i++){
-
-            quality -= 0.07;
-
-            if(quality < 0.1)
-                quality = 0.1;
-
-            blob = await canvasToBlob(
-                outCanvas,
-                format,
-                quality
-            );
-        }
-
-        /*
-         If still too large,
-         reduce dimensions gradually.
-        */
-
-        let attempts = 0;
-
-        while(blob.size > targetKB*1024 && attempts < 15){
-
-            width = Math.max(50,Math.round(width*0.9));
-            height = Math.max(50,Math.round(height*0.9));
-
-            outCanvas.width = width;
-            outCanvas.height = height;
-
-            ctx = outCanvas.getContext("2d");
-
-            if(format === "image/jpeg"){
-                ctx.fillStyle = "#ffffff";
-                ctx.fillRect(0,0,width,height);
-            }
-
-            ctx.drawImage(canvas,0,0,width,height);
-
-            blob = await canvasToBlob(
-                outCanvas,
-                format,
-                0.7
-            );
-
-            attempts++;
-        }
-
-    }else{
-
-        blob = await canvasToBlob(
-            outCanvas,
-            format,
-            0.9
-        );
-    }
-
-
-    if(currentObjectURL){
-        URL.revokeObjectURL(currentObjectURL);
-    }
-
-    currentObjectURL = URL.createObjectURL(blob);
-
-    const extension =
-        format === "image/png" ? "png" :
-        format === "image/webp" ? "webp" : "jpg";
-
-    result.innerHTML = `
-        <div>
-            <b>Result</b><br>
-            ${width} × ${height} px<br>
-            ${Math.round(blob.size/1024)} KB
-        </div>
-
-        <a class="btn"
-           href="${currentObjectURL}"
-           download="SSODAYS-image.${extension}">
-           ⬇️ Download Image
-        </a>
-    `;
-
-    status.innerText = "Image तैयार है ✅";
-
-});
-
-
-/* CANVAS TO BLOB */
-
-function canvasToBlob(canvas,format,quality){
-
-    return new Promise(function(resolve){
-
-        canvas.toBlob(
-            function(blob){
-                resolve(blob);
-            },
-            format,
-            quality
-        );
+        };
 
     });
 
+
+    /* ================= ROTATE LEFT ================= */
+
+    rotateLeftBtn.addEventListener(
+        "click",
+        function(){
+
+            if(!cropper) return;
+
+            if(currentRotation > -180){
+
+                currentRotation--;
+
+                cropper.rotateTo(
+                    currentRotation
+                );
+
+                rotateSlider.value =
+                    currentRotation;
+
+                rotateValue.innerText =
+                    currentRotation;
+            }
+
+        }
+    );
+
+
+    /* ================= ROTATE RIGHT ================= */
+
+    rotateRightBtn.addEventListener(
+        "click",
+        function(){
+
+            if(!cropper) return;
+
+            if(currentRotation < 180){
+
+                currentRotation++;
+
+                cropper.rotateTo(
+                    currentRotation
+                );
+
+                rotateSlider.value =
+                    currentRotation;
+
+                rotateValue.innerText =
+                    currentRotation;
+            }
+
+        }
+    );
+
+
+    /* ================= ROTATION SLIDER ================= */
+
+    rotateSlider.addEventListener(
+        "input",
+        function(){
+
+            if(!cropper) return;
+
+            currentRotation =
+                parseInt(this.value);
+
+            cropper.rotateTo(
+                currentRotation
+            );
+
+            rotateValue.innerText =
+                currentRotation;
+        }
+    );
+
+
+    /* ================= ZOOM IN ================= */
+
+    zoomInBtn.addEventListener(
+        "click",
+        function(){
+
+            if(!cropper) return;
+
+            cropper.zoom(0.1);
+
+        }
+    );
+
+
+    /* ================= ZOOM OUT ================= */
+
+    zoomOutBtn.addEventListener(
+        "click",
+        function(){
+
+            if(!cropper) return;
+
+            cropper.zoom(-0.1);
+
+        }
+    );
+
+
+    /* ================= RESET ================= */
+
+    resetEditorBtn.addEventListener(
+        "click",
+        function(){
+
+            if(!cropper) return;
+
+            cropper.reset();
+
+            currentRotation = 0;
+
+            rotateSlider.value = 0;
+
+            rotateValue.innerText = "0";
+
+            status.innerText =
+                "Editor reset हो गया।";
+
+        }
+    );
+
+
+    /* ================= APPLY CROP ================= */
+
+    applyCropBtn.addEventListener(
+        "click",
+        function(){
+
+            if(!cropper){
+
+                status.innerText =
+                    "पहले photo चुनें।";
+
+                return;
+            }
+
+
+            const croppedCanvas =
+                cropper.getCroppedCanvas({
+
+                    imageSmoothingEnabled: true,
+
+                    imageSmoothingQuality: "high"
+
+                });
+
+
+            if(!croppedCanvas){
+
+                status.innerText =
+                    "Crop नहीं हो पाया।";
+
+                return;
+            }
+
+
+            widthInput.value =
+                croppedCanvas.width;
+
+            heightInput.value =
+                croppedCanvas.height;
+
+
+            resizeControls.style.display =
+                "flex";
+
+            convertControls.style.display =
+                "flex";
+
+            processControls.style.display =
+                "flex";
+
+
+            /* Store cropped canvas */
+
+            window.finalImageCanvas =
+                croppedCanvas;
+
+
+            /* Destroy editor */
+
+            cropper.destroy();
+
+            cropper = null;
+
+
+            /* Show cropped result */
+
+            image.src =
+                croppedCanvas.toDataURL(
+                    "image/png"
+                );
+
+
+            status.innerText =
+                "Crop complete ✅ अब Width, Height और Target KB चुनें।";
+
+        }
+    );
+
+
+    /* ================= PROCESS IMAGE ================= */
+
+    processBtn.addEventListener(
+        "click",
+        async function(){
+
+            const sourceCanvas =
+                window.finalImageCanvas;
+
+
+            if(!sourceCanvas){
+
+                status.innerText =
+                    "पहले Crop Apply करें।";
+
+                return;
+            }
+
+
+            let width =
+                parseInt(
+                    widthInput.value
+                );
+
+            let height =
+                parseInt(
+                    heightInput.value
+                );
+
+
+            if(!width || !height){
+
+                width =
+                    sourceCanvas.width;
+
+                height =
+                    sourceCanvas.height;
+            }
+
+
+            const format =
+                formatInput.value;
+
+
+            const targetKB =
+                parseFloat(
+                    targetKBInput.value
+                );
+
+
+            if(
+                format === "image/png" &&
+                targetKB
+            ){
+
+                status.innerText =
+                    "PNG में Target KB compression नहीं किया जा सकता। JPG या WEBP चुनें।";
+
+                return;
+            }
+
+
+            let outCanvas =
+                document.createElement(
+                    "canvas"
+                );
+
+
+            outCanvas.width =
+                width;
+
+            outCanvas.height =
+                height;
+
+
+            let ctx =
+                outCanvas.getContext(
+                    "2d"
+                );
+
+
+            if(format === "image/jpeg"){
+
+                ctx.fillStyle =
+                    "#ffffff";
+
+                ctx.fillRect(
+                    0,
+                    0,
+                    width,
+                    height
+                );
+            }
+
+
+            ctx.drawImage(
+                sourceCanvas,
+                0,
+                0,
+                width,
+                height
+            );
+
+
+            let blob;
+
+
+            /* ================= TARGET KB ================= */
+
+            if(
+                targetKB &&
+                (
+                    format === "image/jpeg" ||
+                    format === "image/webp"
+                )
+            ){
+
+                let quality =
+                    0.90;
+
+
+                blob =
+                    await canvasToBlob(
+                        outCanvas,
+                        format,
+                        quality
+                    );
+
+
+                /* Reduce quality */
+
+                for(
+                    let i = 0;
+                    i < 15 &&
+                    blob.size > targetKB * 1024;
+                    i++
+                ){
+
+                    quality -= 0.05;
+
+                    if(quality < 0.05){
+
+                        quality = 0.05;
+                    }
+
+
+                    blob =
+                        await canvasToBlob(
+                            outCanvas,
+                            format,
+                            quality
+                        );
+                }
+
+
+                /* Reduce dimensions if needed */
+
+                let attempts = 0;
+
+
+                while(
+                    blob.size >
+                    targetKB * 1024 &&
+                    attempts < 20
+                ){
+
+                    width =
+                        Math.max(
+                            50,
+                            Math.round(
+                                width * 0.90
+                            )
+                        );
+
+
+                    height =
+                        Math.max(
+                            50,
+                            Math.round(
+                                height * 0.90
+                            )
+                        );
+
+
+                    outCanvas.width =
+                        width;
+
+                    outCanvas.height =
+                        height;
+
+
+                    ctx =
+                        outCanvas.getContext(
+                            "2d"
+                        );
+
+
+                    if(
+                        format ===
+                        "image/jpeg"
+                    ){
+
+                        ctx.fillStyle =
+                            "#ffffff";
+
+                        ctx.fillRect(
+                            0,
+                            0,
+                            width,
+                            height
+                        );
+                    }
+
+
+                    ctx.drawImage(
+                        sourceCanvas,
+                        0,
+                        0,
+                        width,
+                        height
+                    );
+
+
+                    blob =
+                        await canvasToBlob(
+                            outCanvas,
+                            format,
+                            0.70
+                        );
+
+
+                    attempts++;
+                }
+
+            }else{
+
+                blob =
+                    await canvasToBlob(
+                        outCanvas,
+                        format,
+                        0.90
+                    );
+            }
+
+
+        /* ================= DOWNLOAD ================= */
+
+if(currentObjectURL){
+
+    URL.revokeObjectURL(
+        currentObjectURL
+    );
 }
+
+
+currentObjectURL =
+    URL.createObjectURL(
+        blob
+    );
+
+
+const extension =
+    format === "image/png"
+        ? "png"
+        : format === "image/webp"
+            ? "webp"
+            : "jpg";
+
+
+result.innerHTML = `
+
+    <div>
+
+        <b>✅ Result Ready</b>
+
+        <br><br>
+
+        Size:
+        ${width} × ${height} px
+
+        <br>
+
+        File Size:
+        ${Math.round(
+            blob.size / 1024
+        )} KB
+
+    </div>
+
+
+    <a
+        class="btn"
+        href="${currentObjectURL}"
+        download="SSODAYS-image.${extension}"
+    >
+
+        ⬇️ Download Image
+
+    </a>
+
+`;
+
+
+status.innerText =
+    "Image तैयार है ✅";
+
+}
+);
+
+
+/* ================= CANVAS TO BLOB ================= */
+
+function canvasToBlob(
+    canvas,
+    format,
+    quality
+){
+
+    return new Promise(
+        function(resolve){
+
+            canvas.toBlob(
+                function(blob){
+
+                    resolve(blob);
+
+                },
+                format,
+                quality
+            );
+
+        }
+    );
+
+}
+
 
 })();
