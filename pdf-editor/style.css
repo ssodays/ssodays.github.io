@@ -2,114 +2,205 @@
     box-sizing:border-box;
     margin:0;
     padding:0;
-    font-family:Arial,sans-serif;
 }
 
+html,
 body{
-    background:#f4f7fb;
-    color:#222;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+    background:#27272b;
+    color:#fff;
 }
 
 
 /* ================= HEADER ================= */
 
 header{
+    height:72px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 18px;
+
     background:#123b6d;
+
     color:white;
-    text-align:center;
-    padding:20px 15px;
+
+    position:relative;
+
+    z-index:1000;
 }
 
 header h1{
-    font-size:30px;
+    font-size:25px;
+    font-weight:bold;
 }
 
-header p{
-    margin-top:7px;
-    font-size:14px;
+.close-btn{
+    border:0;
+
+    background:white;
+    color:#222;
+
+    padding:11px 18px;
+
+    border-radius:8px;
+
+    font-size:16px;
+
+    cursor:pointer;
 }
 
 
 /* ================= TOOLBAR ================= */
 
-.toolbar{
-    position:sticky;
-    top:0;
-    z-index:1000;
+.pdf-toolbar{
+    height:58px;
+
+    display:flex;
+    align-items:center;
+
+    gap:4px;
+
+    padding:5px 8px;
+
+    background:#29292d;
+
+    border-bottom:1px solid #111;
+
+    overflow-x:auto;
+    overflow-y:hidden;
+
+    white-space:nowrap;
+
+    position:relative;
+
+    z-index:900;
+
+    -webkit-overflow-scrolling:touch;
+}
+
+
+.toolbar-icon{
+    min-width:42px;
+    height:42px;
 
     display:flex;
     align-items:center;
     justify-content:center;
-    flex-wrap:wrap;
-    gap:7px;
 
-    padding:10px;
-
-    background:white;
-
-    box-shadow:0 2px 10px #ccc;
-}
-
-
-.tool-btn{
     border:0;
-    background:#123b6d;
-    color:white;
 
-    padding:9px 12px;
+    background:transparent;
 
-    border-radius:7px;
+    color:#ddd;
 
-    font-size:14px;
+    font-size:21px;
 
     cursor:pointer;
 
+    border-radius:4px;
+
+    flex-shrink:0;
+
     text-decoration:none;
+}
 
-    white-space:nowrap;
+.toolbar-icon:hover{
+    background:#444448;
+}
+
+.toolbar-icon:active{
+    background:#55555a;
 }
 
 
-.tool-btn:hover{
-    background:#0d2d54;
+.page-number{
+    width:72px;
+    height:42px;
+
+    background:#3b3b40;
+
+    color:white;
+
+    border:1px solid #666;
+
+    border-radius:3px;
+
+    text-align:center;
+
+    font-size:16px;
+
+    flex-shrink:0;
 }
 
 
-.tool-btn.active{
-    background:#2196f3;
+.page-count{
+    color:#ccc;
+
+    font-size:15px;
+
+    margin-right:5px;
+
+    flex-shrink:0;
 }
 
 
-.tool-btn.danger{
-    background:#c62828;
+/* ================= SEARCH ================= */
+
+.search-box{
+    position:absolute;
+
+    top:130px;
+    right:10px;
+
+    z-index:3000;
+
+    display:flex;
+
+    gap:4px;
+
+    padding:8px;
+
+    background:#333;
+
+    border:1px solid #666;
+
+    border-radius:6px;
+
+    box-shadow:0 3px 15px #000;
 }
 
+.search-box input{
+    width:210px;
 
-.tool-btn.danger:hover{
-    background:#a91f1f;
+    padding:9px;
+
+    border:1px solid #777;
+
+    border-radius:4px;
+
+    background:#222;
+
+    color:white;
+
+    outline:none;
 }
 
+.search-box button{
+    min-width:38px;
 
-.download-btn{
-    background:#188038;
-}
+    border:0;
 
+    border-radius:4px;
 
-.download-btn:hover{
-    background:#12652b;
-}
+    background:#555;
 
-
-.tool-select{
-    padding:8px 10px;
-
-    border:1px solid #ccc;
-
-    border-radius:7px;
-
-    font-size:14px;
-
-    background:white;
+    color:white;
 
     cursor:pointer;
 }
@@ -118,70 +209,78 @@ header p{
 /* ================= STATUS ================= */
 
 .status{
-    max-width:1100px;
+    position:absolute;
 
-    margin:12px auto 0;
+    top:140px;
+    left:50%;
 
-    padding:10px 15px;
+    transform:translateX(-50%);
 
-    text-align:center;
+    z-index:100;
 
-    background:white;
+    padding:7px 14px;
 
-    border-radius:8px;
+    border-radius:5px;
 
-    box-shadow:0 2px 8px #ddd;
+    background:rgba(0,0,0,.65);
 
-    color:#123b6d;
+    color:#ddd;
 
-    font-weight:bold;
+    font-size:13px;
+
+    pointer-events:none;
 }
 
 
-/* ================= PDF AREA ================= */
+/* ================= PDF VIEWER ================= */
 
-.pdf-area{
-    width:100%;
+.viewer-container{
+    position:absolute;
 
-    min-height:75vh;
-
-    padding:20px 10px 40px;
-
-    background:#e5e5e5;
+    top:130px;
+    left:0;
+    right:0;
+    bottom:0;
 
     overflow:auto;
 
-    touch-action:pan-x pan-y pinch-zoom;
+    background:#27272b;
 
     -webkit-overflow-scrolling:touch;
+
+    touch-action:pan-x pan-y pinch-zoom;
+
+    overscroll-behavior:contain;
+
+    padding:25px 10px 50px;
 }
 
 
 /* ================= WELCOME ================= */
 
 .welcome{
-    max-width:500px;
+    width:min(450px,90%);
 
-    margin:70px auto;
+    margin:100px auto;
 
     padding:35px 20px;
 
     text-align:center;
 
-    background:white;
+    background:#fff;
 
-    border-radius:15px;
+    color:#333;
 
-    box-shadow:0 3px 15px #ccc;
+    border-radius:10px;
+
+    box-shadow:0 5px 25px #111;
 }
-
 
 .welcome-icon{
     font-size:55px;
 
-    margin-bottom:12px;
+    margin-bottom:15px;
 }
-
 
 .welcome h2{
     color:#123b6d;
@@ -189,24 +288,22 @@ header p{
     margin-bottom:10px;
 }
 
-
 .welcome p{
     color:#666;
 
     margin-bottom:20px;
 }
 
-
-.main-upload-btn{
+.open-pdf-btn{
     display:inline-block;
+
+    padding:12px 20px;
 
     background:#123b6d;
 
     color:white;
 
-    padding:12px 20px;
-
-    border-radius:8px;
+    border-radius:7px;
 
     cursor:pointer;
 
@@ -214,16 +311,9 @@ header p{
 }
 
 
-.main-upload-btn:hover{
-    background:#0d2d54;
-}
-
-
 /* ================= PDF CONTAINER ================= */
 
 .pdf-container{
-    width:100%;
-
     display:flex;
 
     flex-direction:column;
@@ -231,6 +321,12 @@ header p{
     align-items:center;
 
     gap:20px;
+
+    width:max-content;
+
+    min-width:100%;
+
+    margin:0 auto;
 }
 
 
@@ -241,13 +337,11 @@ header p{
 
     background:white;
 
-    box-shadow:0 3px 15px #999;
-
-    overflow:hidden;
-
-    max-width:none;
+    box-shadow:0 3px 20px #111;
 
     flex-shrink:0;
+
+    overflow:visible;
 }
 
 
@@ -256,9 +350,11 @@ header p{
 .pdf-page canvas{
     display:block;
 
-    max-width:none;
+    width:auto;
 
     height:auto;
+
+    max-width:none;
 }
 
 
@@ -273,6 +369,7 @@ header p{
     z-index:10;
 
     touch-action:pan-x pan-y pinch-zoom;
+
     -webkit-user-select:none;
     user-select:none;
 }
@@ -295,13 +392,12 @@ header p{
 }
 
 
-/* ================= TEXT OBJECT ================= */
+/* ================= TEXT ================= */
 
 .pdf-text{
     position:absolute;
 
     min-width:20px;
-
     min-height:20px;
 
     padding:2px 4px;
@@ -321,15 +417,14 @@ header p{
     z-index:30;
 }
 
-
 .pdf-text.selected{
     border:1px dashed #2196f3;
 
-    background:rgba(33,150,243,0.08);
+    background:rgba(33,150,243,.08);
 }
 
 
-/* ================= IMAGE OBJECT ================= */
+/* ================= IMAGE ================= */
 
 .pdf-image{
     position:absolute;
@@ -345,13 +440,12 @@ header p{
     user-select:none;
 }
 
-
 .pdf-image.selected{
     border:2px solid #2196f3;
 }
 
 
-/* ================= IMAGE RESIZE HANDLE ================= */
+/* ================= RESIZE ================= */
 
 .resize-handle{
     position:absolute;
@@ -377,7 +471,7 @@ header p{
 .highlight-mark{
     position:absolute;
 
-    background:rgba(255,235,59,0.45);
+    background:rgba(255,235,59,.45);
 
     pointer-events:none;
 
@@ -385,18 +479,14 @@ header p{
 }
 
 
-/* ================= POPUP ================= */
+/* ================= TEXT POPUP ================= */
 
 .popup{
     position:fixed;
 
-    top:0;
-    left:0;
+    inset:0;
 
-    width:100%;
-    height:100%;
-
-    background:rgba(0,0,0,0.55);
+    background:rgba(0,0,0,.65);
 
     display:flex;
 
@@ -409,28 +499,26 @@ header p{
     padding:15px;
 }
 
-
 .popup-box{
     width:100%;
-
     max-width:450px;
 
     background:white;
+
+    color:#222;
 
     padding:20px;
 
     border-radius:12px;
 
-    box-shadow:0 5px 25px #222;
+    box-shadow:0 5px 25px #000;
 }
-
 
 .popup-box h3{
     color:#123b6d;
 
     margin-bottom:12px;
 }
-
 
 .popup-box textarea{
     width:100%;
@@ -450,12 +538,6 @@ header p{
     outline:none;
 }
 
-
-.popup-box textarea:focus{
-    border-color:#123b6d;
-}
-
-
 .popup-row{
     display:flex;
 
@@ -466,36 +548,22 @@ header p{
     flex-wrap:wrap;
 }
 
+.popup-btn{
+    padding:10px 18px;
 
-/* ================= FOOTER ================= */
+    border:0;
 
-footer{
-    margin-top:0;
+    border-radius:6px;
 
     background:#123b6d;
 
     color:white;
 
-    text-align:center;
-
-    padding:20px;
+    cursor:pointer;
 }
 
-
-.back-btn{
-    display:inline-block;
-
-    background:white;
-
-    color:#123b6d;
-
-    text-decoration:none;
-
-    padding:9px 15px;
-
-    border-radius:7px;
-
-    font-weight:bold;
+.popup-btn.cancel{
+    background:#777;
 }
 
 
@@ -503,55 +571,58 @@ footer{
 
 @media(max-width:700px){
 
+    header{
+        height:72px;
+
+        padding:0 14px;
+    }
+
     header h1{
-        font-size:27px;
+        font-size:23px;
+    }
+
+    .close-btn{
+        padding:10px 14px;
+
+        font-size:15px;
     }
 
 
-    .toolbar{
+    .pdf-toolbar{
+        height:55px;
+
         justify-content:flex-start;
 
-        overflow-x:auto;
+        padding:4px 6px;
 
-        flex-wrap:nowrap;
-
-        padding:8px;
-
-        -webkit-overflow-scrolling:touch;
+        gap:2px;
     }
 
 
-    .tool-btn{
-        padding:8px 10px;
+    .toolbar-icon{
+        min-width:40px;
 
-        font-size:13px;
+        height:40px;
+
+        font-size:20px;
     }
 
 
-    .tool-select{
-        padding:7px 8px;
+    .page-number{
+        width:62px;
 
-        font-size:13px;
-
-        flex-shrink:0;
+        height:40px;
     }
 
 
-    .status{
-        margin:10px;
+    .viewer-container{
+        top:127px;
 
-        font-size:13px;
-    }
-
-
-    .pdf-area{
-        padding:12px 5px 30px;
+        padding:15px 5px 40px;
 
         overflow:auto;
 
         touch-action:pan-x pan-y pinch-zoom;
-
-        -webkit-overflow-scrolling:touch;
     }
 
 
@@ -563,8 +634,6 @@ footer{
 
 
     .pdf-page{
-        width:auto;
-
         max-width:none;
 
         flex-shrink:0;
@@ -573,10 +642,30 @@ footer{
 
     .pdf-page canvas{
         max-width:none;
+    }
+
+
+    .status{
+        top:135px;
+
+        font-size:12px;
+    }
+
+
+    .search-box{
+        top:135px;
+
+        left:5px;
+        right:5px;
 
         width:auto;
+    }
 
-        height:auto;
+
+    .search-box input{
+        width:100%;
+
+        min-width:0;
     }
 
 }
@@ -586,40 +675,18 @@ footer{
 
 @media(max-width:400px){
 
-    header{
-        padding:17px 10px;
-    }
-
-
     header h1{
-        font-size:24px;
+        font-size:21px;
     }
 
+    .close-btn{
+        font-size:14px;
 
-    header p{
-        font-size:13px;
+        padding:9px 12px;
     }
 
-
-    .toolbar{
-        gap:5px;
-    }
-
-
-    .tool-btn{
-        padding:7px 9px;
-
-        font-size:12px;
-    }
-
-
-    .tool-select{
-        font-size:12px;
-    }
-
-
-    .status{
-        font-size:12px;
+    .viewer-container{
+        top:127px;
     }
 
     }
