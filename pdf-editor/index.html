@@ -3,25 +3,27 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>SSODAYS - PDF Editor</title>
+    <title>PDF Editor - SSODAYS</title>
 
-<!-- PDF.js -->
-<link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf_viewer.min.css"
->
 
-<link
-    rel="stylesheet"
-    href="style.css"
->
+    <!-- PDF.js Viewer CSS -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css"
+    >
+
+    <!-- Our CSS -->
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
 </head>
 
@@ -33,88 +35,140 @@
 
 <header>
 
-    <h1>📄 PDF Editor</h1>
+    <div class="header-left">
 
-    <p>
-        Edit PDF • Text • Pencil • Highlight • Image
-    </p>
+        <h1>PDF Viewer</h1>
+
+    </div>
+
+
+    <button
+        id="closeBtn"
+        class="close-btn"
+    >
+        ✕ Close
+    </button>
 
 </header>
 
 
+
 <!-- ================= TOOLBAR ================= -->
 
-<div class="toolbar">
+<div class="pdf-toolbar">
+
+
+    <!-- Open PDF -->
 
     <label
-        class="tool-btn upload-btn"
         for="pdfInput"
+        class="toolbar-icon"
+        title="Open PDF"
     >
-        📤 PDF
+        📂
     </label>
 
     <input
         type="file"
         id="pdfInput"
-        accept="application/pdf"
+        accept="application/pdf,.pdf"
         hidden
     >
 
 
+    <!-- Search -->
+
     <button
-        class="tool-btn"
+        id="searchBtn"
+        class="toolbar-icon"
+        title="Search"
+    >
+        🔍
+    </button>
+
+
+    <!-- Page Number -->
+
+    <input
+        id="pageNumber"
+        class="page-number"
+        type="number"
+        value="1"
+        min="1"
+    >
+
+
+    <span
+        id="pageCount"
+        class="page-count"
+    >
+        / 0
+    </span>
+
+
+    <!-- Zoom Out -->
+
+    <button
+        id="zoomOut"
+        class="toolbar-icon"
+        title="Zoom Out"
+    >
+        −
+    </button>
+
+
+    <!-- Zoom In -->
+
+    <button
+        id="zoomIn"
+        class="toolbar-icon"
+        title="Zoom In"
+    >
+        +
+    </button>
+
+
+    <!-- Pencil -->
+
+    <button
         id="pencilBtn"
-        type="button"
+        class="toolbar-icon"
+        title="Pencil"
     >
-        ✏️ Pencil
+        ✏️
     </button>
 
 
-    <button
-        class="tool-btn"
-        id="highlightBtn"
-        type="button"
-    >
-        🖍️ Highlight
-    </button>
-
+    <!-- Text -->
 
     <button
-        class="tool-btn"
         id="textBtn"
-        type="button"
+        class="toolbar-icon"
+        title="Text"
     >
-        T Text
+        T
     </button>
 
 
-    <select
-        id="textSize"
-        class="tool-select"
+    <!-- Highlight -->
+
+    <button
+        id="highlightBtn"
+        class="toolbar-icon"
+        title="Highlight"
     >
+        🖍️
+    </button>
 
-        <option value="10">10</option>
-        <option value="12">12</option>
-        <option value="14">14</option>
-        <option value="16" selected>16</option>
-        <option value="18">18</option>
-        <option value="20">20</option>
-        <option value="24">24</option>
-        <option value="28">28</option>
-        <option value="32">32</option>
-        <option value="40">40</option>
-        <option value="48">48</option>
-        <option value="60">60</option>
-        <option value="72">72</option>
 
-    </select>
-
+    <!-- Image -->
 
     <label
-        class="tool-btn"
         for="imageInput"
+        class="toolbar-icon"
+        title="Add Image"
     >
-        🖼️ Image
+        🖼️
     </label>
 
     <input
@@ -125,51 +179,49 @@
     >
 
 
+    <!-- More -->
+
     <button
-        class="tool-btn"
-        id="undoBtn"
-        type="button"
+        id="moreBtn"
+        class="toolbar-icon"
+        title="More"
     >
-        ↩️ Undo
+        »
     </button>
 
 
-    <button
-        class="tool-btn danger"
-        id="deleteBtn"
-        type="button"
+</div>
+
+
+
+<!-- ================= SEARCH BOX ================= -->
+
+<div
+    id="searchBox"
+    class="search-box"
+    hidden
+>
+
+    <input
+        id="searchInput"
+        type="text"
+        placeholder="PDF में खोजें..."
     >
-        🗑️ Delete
+
+    <button id="searchPrev">
+        ↑
     </button>
 
-
-    <button
-        class="tool-btn"
-        id="zoomOutBtn"
-        type="button"
-    >
-        🔍 −
+    <button id="searchNext">
+        ↓
     </button>
 
-
-    <button
-        class="tool-btn"
-        id="zoomInBtn"
-        type="button"
-    >
-        🔍 +
-    </button>
-
-
-    <button
-        class="tool-btn download-btn"
-        id="downloadBtn"
-        type="button"
-    >
-        ⬇️ Download
+    <button id="searchClose">
+        ✕
     </button>
 
 </div>
+
 
 
 <!-- ================= STATUS ================= -->
@@ -178,15 +230,16 @@
     id="status"
     class="status"
 >
-    📤 PDF चुनें
+    PDF खोलने के लिए 📂 दबाएँ
 </div>
 
 
-<!-- ================= PDF AREA ================= -->
 
-<div
-    id="pdfArea"
-    class="pdf-area"
+<!-- ================= PDF VIEWER ================= -->
+
+<main
+    id="viewerContainer"
+    class="viewer-container"
 >
 
 
@@ -200,73 +253,72 @@
         </div>
 
         <h2>
-            PDF Editor
+            PDF Viewer
         </h2>
 
         <p>
-            अपनी PDF चुनें और यहीं edit करें।
+            अपनी PDF चुनें और ब्राउज़र में खोलें।
         </p>
 
+
         <label
-            class="main-upload-btn"
             for="pdfInput"
+            class="open-pdf-btn"
         >
-            📤 Choose PDF
+            📂 Choose PDF
         </label>
 
     </div>
 
 
-    <!-- PDF pages will be added here -->
+    <!-- PDF pages -->
 
     <div
         id="pdfContainer"
         class="pdf-container"
-    >
-    </div>
+    ></div>
 
 
-</div>
+</main>
 
 
-<!-- ================= TEXT INPUT POPUP ================= -->
+
+<!-- ================= TEXT POPUP ================= -->
 
 <div
     id="textPopup"
     class="popup"
-    style="display:none;"
+    hidden
 >
 
     <div class="popup-box">
 
         <h3>
-            T Text
+            Text जोड़ें
         </h3>
 
 
         <textarea
             id="textInput"
-            placeholder="यहाँ अपना text लिखें..."
+            placeholder="यहाँ text लिखें..."
         ></textarea>
 
 
         <div class="popup-row">
 
             <button
-                class="tool-btn"
                 id="addTextBtn"
-                type="button"
+                class="popup-btn"
             >
-                ✅ Add Text
+                Add
             </button>
 
 
             <button
-                class="tool-btn danger"
                 id="cancelTextBtn"
-                type="button"
+                class="popup-btn cancel"
             >
-                ✕ Cancel
+                Cancel
             </button>
 
         </div>
@@ -276,52 +328,28 @@
 </div>
 
 
-<!-- ================= FOOTER ================= -->
 
-<footer>
-
-    <a
-        href="../index.html"
-        class="back-btn"
-    >
-        ← Back to SSODAYS
-    </a>
-
-    <br><br>
-
-    © 2026 SSODAYS • All Rights Reserved
-
-</footer>
-
-
-<!-- ================= LIBRARIES ================= -->
-
-<!-- PDF.js -->
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
-
-<!-- pdf-lib -->
+<!-- ================= PDF LIB ================= -->
 
 <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js">
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"
+>
 </script>
 
 
-<!-- Fabric.js -->
+<!-- ================= PDF.JS ================= -->
 
 <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js">
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
+>
 </script>
 
 
-<!-- Our Script -->
+<!-- ================= OUR SCRIPT ================= -->
 
-<script
-    src="script.js">
-</script>
+<script src="script.js"></script>
 
 
 </body>
 
-  </html>
+    </html>
