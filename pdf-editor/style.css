@@ -271,6 +271,10 @@ header p{
     left:0;
 
     z-index:10;
+
+    touch-action:pan-x pan-y pinch-zoom;
+    -webkit-user-select:none;
+    user-select:none;
 }
 
 
