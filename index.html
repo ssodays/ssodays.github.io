@@ -4,7 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SSODAYS</title>
+
 <link rel="stylesheet" href="style.css">
+
+<!-- Cropper.js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+
 </head>
 
 <body>
@@ -36,14 +41,18 @@
     </div>
 </section>
 
+
 <section id="pdf" class="section">
     <div class="card">
         <h2>📄 PDF Documents</h2>
+
         <div id="pdfList">
             <p>PDFs loading...</p>
         </div>
+
     </div>
 </section>
+
 
 <section id="games" class="section">
     <div class="card">
@@ -60,8 +69,10 @@
             <br><br>
             <a class="btn" href="#">Play Game</a>
         </div>
+
     </div>
 </section>
+
 
 <section id="notice" class="section">
     <div class="card">
@@ -78,33 +89,227 @@
             <br><br>
             Important information will appear here.
         </div>
+
     </div>
 </section>
+
+
 <section id="tools" class="section">
-    <div class="card">
-        <h2>🛠️ Image Tools</h2>
-        <p>Photo Crop • Resize • KB Converter</p>
 
-        <!-- Tools ka code yahan aayega -->
+    <div class="card">
+
+        <h2>🛠️ Image Tools</h2>
+
+        <p>Photo Crop • Zoom • Rotate • Resize • KB Converter</p>
+
+        <div class="tool-box">
+
+            <input
+                type="file"
+                id="imageInput"
+                class="tool-input"
+                accept="image/*"
+            >
+
+            <div id="imageEditor" style="display:none;">
+
+                <div class="image-editor-area">
+
+                    <img
+                        id="editImage"
+                        alt="Selected Image"
+                    >
+
+                </div>
+
+
+                <div class="rotate-controls">
+
+                    <button
+                        class="btn"
+                        type="button"
+                        onclick="rotateLeft()">
+                        ↶ -1°
+                    </button>
+
+                    <input
+                        type="range"
+                        id="rotateSlider"
+                        min="-180"
+                        max="180"
+                        value="0"
+                        step="1"
+                        oninput="rotateFromSlider(this.value)"
+                    >
+
+                    <button
+                        class="btn"
+                        type="button"
+                        onclick="rotateRight()">
+                        ↷ +1°
+                    </button>
+
+                </div>
+
+
+                <div class="rotate-value">
+                    Rotation:
+                    <span id="rotateValue">0</span>°
+                </div>
+
+
+                <div class="zoom-controls">
+
+                    <button
+                        class="btn"
+                        type="button"
+                        onclick="zoomOutImage()">
+                        🔍 −
+                    </button>
+
+                    <button
+                        class="btn"
+                        type="button"
+                        onclick="zoomInImage()">
+                        🔍 +
+                    </button>
+
+                    <button
+                        class="btn"
+                        type="button"
+                        onclick="resetImageEditor()">
+                        🔄 Reset
+                    </button>
+
+                </div>
+
+
+                <div class="tool-row">
+
+                    <button
+                        class="btn"
+                        type="button"
+                        onclick="applyImageCrop()">
+                        ✂️ Apply Crop
+                    </button>
+
+                </div>
+
+
+                <div class="tool-row">
+
+                    <input
+                        type="number"
+                        id="imageWidth"
+                        placeholder="Width (px)"
+                        min="1"
+                    >
+
+                    <input
+                        type="number"
+                        id="imageHeight"
+                        placeholder="Height (px)"
+                        min="1"
+                    >
+
+                </div>
+
+
+                <div class="tool-row">
+
+                    <select id="imageFormat">
+
+                        <option value="image/jpeg">
+                            JPG
+                        </option>
+
+                        <option value="image/webp">
+                            WEBP
+                        </option>
+
+                        <option value="image/png">
+                            PNG
+                        </option>
+
+                    </select>
+
+
+                    <input
+                        type="number"
+                        id="targetKB"
+                        placeholder="Target KB"
+                        min="1"
+                    >
+
+                </div>
+
+
+                <div class="tool-row">
+
+                    <button
+                        class="btn"
+                        type="button"
+                        onclick="processImage()">
+                        🔄 Resize / Convert
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="toolStatus"
+                    style="margin-top:12px;">
+                </div>
+
+
+                <div
+                    id="toolResult"
+                    class="tool-result">
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
+
 </section>
+
 </div>
+
 
 <footer>
     © 2026 SSODAYS • All Rights Reserved
 </footer>
 
+
 <!-- PDF Viewer -->
+
 <div id="pdfViewer">
+
     <div class="viewer-header">
+
         <b>PDF Viewer</b>
-        <button onclick="closePDF()">✕ Close</button>
+
+        <button onclick="closePDF()">
+            ✕ Close
+        </button>
+
     </div>
 
-    <iframe id="pdfFrame" title="PDF Viewer"></iframe>
+    <iframe
+        id="pdfFrame"
+        title="PDF Viewer">
+    </iframe>
+
 </div>
 
+
+<!-- Cropper.js -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+
 <script src="script.js"></script>
+
 </body>
 </html>
