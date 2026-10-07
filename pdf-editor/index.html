@@ -1,355 +1,222 @@
 <!DOCTYPE html>
 <html lang="hi">
-
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+>
 
-    <title>PDF Editor - SSODAYS</title>
+<title>SSODAYS PDF Editor</title>
 
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css"
+>
 
-    <!-- PDF.js Viewer CSS -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css"
-    >
-
-    <!-- Our CSS -->
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+<link rel="stylesheet" href="style.css">
 
 </head>
 
-
 <body>
 
+<header class="topbar">
 
-<!-- ================= HEADER ================= -->
-
-<header>
-
-    <div class="header-left">
-
-        <h1>PDF Viewer</h1>
-
+    <div class="title">
+        📄 SSODAYS PDF Editor
     </div>
 
-
-    <button
-        id="closeBtn"
-        class="close-btn"
-    >
+    <button id="closeBtn" class="top-btn">
         ✕ Close
     </button>
 
 </header>
 
 
+<div class="toolbar">
 
-<!-- ================= TOOLBAR ================= -->
-
-<div class="pdf-toolbar">
-
-
-    <!-- Open PDF -->
-
-    <label
-        for="pdfInput"
-        class="toolbar-icon"
-        title="Open PDF"
-    >
-        📂
+    <label class="tool-btn file-btn">
+        📂 PDF
+        <input
+            type="file"
+            id="pdfInput"
+            accept="application/pdf"
+            hidden
+        >
     </label>
 
-    <input
-        type="file"
-        id="pdfInput"
-        accept="application/pdf,.pdf"
-        hidden
-    >
-
-
-    <!-- Search -->
-
-    <button
-        id="searchBtn"
-        class="toolbar-icon"
-        title="Search"
-    >
-        🔍
+    <button id="prevBtn" class="tool-btn">
+        ◀
     </button>
-
-
-    <!-- Page Number -->
 
     <input
         id="pageNumber"
-        class="page-number"
+        class="page-input"
         type="number"
         value="1"
         min="1"
     >
 
-
-    <span
-        id="pageCount"
-        class="page-count"
-    >
-        / 0
+    <span class="page-total">
+        / <span id="pageCount">0</span>
     </span>
 
+    <button id="nextBtn" class="tool-btn">
+        ▶
+    </button>
 
-    <!-- Zoom Out -->
-
-    <button
-        id="zoomOut"
-        class="toolbar-icon"
-        title="Zoom Out"
-    >
+    <button id="zoomOutBtn" class="tool-btn">
         −
     </button>
 
-
-    <!-- Zoom In -->
-
-    <button
-        id="zoomIn"
-        class="toolbar-icon"
-        title="Zoom In"
-    >
+    <button id="zoomInBtn" class="tool-btn">
         +
     </button>
 
-
-    <!-- Pencil -->
-
-    <button
-        id="pencilBtn"
-        class="toolbar-icon"
-        title="Pencil"
-    >
-        ✏️
+    <button id="fitBtn" class="tool-btn">
+        ↔ Fit
     </button>
 
-
-    <!-- Text -->
-
-    <button
-        id="textBtn"
-        class="toolbar-icon"
-        title="Text"
-    >
-        T
+    <button id="pencilBtn" class="tool-btn edit-btn">
+        ✏️ Pencil
     </button>
 
-
-    <!-- Highlight -->
-
-    <button
-        id="highlightBtn"
-        class="toolbar-icon"
-        title="Highlight"
-    >
-        🖍️
+    <button id="highlightBtn" class="tool-btn edit-btn">
+        🖍 Highlight
     </button>
 
+    <button id="textBtn" class="tool-btn edit-btn">
+        T Text
+    </button>
 
-    <!-- Image -->
-
-    <label
-        for="imageInput"
-        class="toolbar-icon"
-        title="Add Image"
-    >
-        🖼️
+    <label class="tool-btn edit-btn">
+        🖼 Image
+        <input
+            type="file"
+            id="imageInput"
+            accept="image/*"
+            hidden
+        >
     </label>
 
-    <input
-        type="file"
-        id="imageInput"
-        accept="image/*"
-        hidden
-    >
-
-
-    <!-- More -->
-
-    <button
-        id="moreBtn"
-        class="toolbar-icon"
-        title="More"
-    >
-        »
+    <button id="undoBtn" class="tool-btn">
+        ↩ Undo
     </button>
 
-
-</div>
-
-
-
-<!-- ================= SEARCH BOX ================= -->
-
-<div
-    id="searchBox"
-    class="search-box"
-    hidden
->
-
-    <input
-        id="searchInput"
-        type="text"
-        placeholder="PDF में खोजें..."
-    >
-
-    <button id="searchPrev">
-        ↑
+    <button id="clearBtn" class="tool-btn danger">
+        🗑 Clear
     </button>
 
-    <button id="searchNext">
-        ↓
-    </button>
-
-    <button id="searchClose">
-        ✕
+    <button id="downloadBtn" class="tool-btn download">
+        ⬇ Download
     </button>
 
 </div>
 
 
-
-<!-- ================= STATUS ================= -->
-
-<div
-    id="status"
-    class="status"
->
-    PDF खोलने के लिए 📂 दबाएँ
+<div id="status">
+    पहले PDF चुनें।
 </div>
 
 
+<div id="viewerContainer">
 
-<!-- ================= PDF VIEWER ================= -->
+    <div id="viewer" class="pdfViewer"></div>
 
-<main
-    id="viewerContainer"
-    class="viewer-container"
->
+</div>
 
 
-    <div
-        id="welcome"
-        class="welcome"
-    >
+<div id="welcome">
+
+    <div class="welcome-box">
 
         <div class="welcome-icon">
             📄
         </div>
 
-        <h2>
-            PDF Viewer
-        </h2>
+        <h2>PDF Editor</h2>
 
         <p>
-            अपनी PDF चुनें और ब्राउज़र में खोलें।
+            अपनी PDF चुनें और browser में edit करें।
         </p>
 
+        <label class="choose-btn">
 
-        <label
-            for="pdfInput"
-            class="open-pdf-btn"
-        >
-            📂 Choose PDF
+            📂 PDF चुनें
+
+            <input
+                type="file"
+                id="welcomeInput"
+                accept="application/pdf"
+                hidden
+            >
+
         </label>
 
-    </div>
-
-
-    <!-- PDF pages -->
-
-    <div
-        id="pdfContainer"
-        class="pdf-container"
-    ></div>
-
-
-</main>
-
-
-
-<!-- ================= TEXT POPUP ================= -->
-
-<div
-    id="textPopup"
-    class="popup"
-    hidden
->
-
-    <div class="popup-box">
-
-        <h3>
-            Text जोड़ें
-        </h3>
-
-
-        <textarea
-            id="textInput"
-            placeholder="यहाँ text लिखें..."
-        ></textarea>
-
-
-        <div class="popup-row">
-
-            <button
-                id="addTextBtn"
-                class="popup-btn"
-            >
-                Add
-            </button>
-
-
-            <button
-                id="cancelTextBtn"
-                class="popup-btn cancel"
-            >
-                Cancel
-            </button>
-
-        </div>
+        <small>
+            आपकी PDF server पर upload नहीं होगी।
+        </small>
 
     </div>
 
 </div>
 
 
+<div id="textPopup" class="popup" hidden>
 
-<!-- ================= PDF LIB ================= -->
+    <div class="popup-title">
+        Text जोड़ें
+    </div>
 
-<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"
->
-</script>
+    <textarea
+        id="textValue"
+        placeholder="यहाँ text लिखें..."
+    ></textarea>
+
+    <div class="popup-row">
+
+        <select id="textSize">
+
+            <option value="12">
+                Small
+            </option>
+
+            <option value="18" selected>
+                Medium
+            </option>
+
+            <option value="26">
+                Large
+            </option>
+
+            <option value="36">
+                Extra Large
+            </option>
+
+        </select>
+
+        <button id="addTextBtn">
+            Add
+        </button>
+
+        <button id="cancelTextBtn">
+            Cancel
+        </button>
+
+    </div>
+
+</div>
 
 
-<!-- ================= PDF.JS ================= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
-<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
->
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.js"></script>
 
-
-<!-- ================= OUR SCRIPT ================= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 
 <script src="script.js"></script>
 
-
 </body>
-
-    </html>
+</html>
