@@ -98,22 +98,20 @@ function setStatus(message){
 
 async function loadPDFJS(){
 
-    if(pdfjs){
+    if(window.pdfjsLib){
+
+        pdfjs = window.pdfjsLib;
+
+        pdfjs.GlobalWorkerOptions.workerSrc =
+            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
         return pdfjs;
 
     }
 
-    setStatus("PDF system loading...");
-
-    pdfjs = await import(
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs"
+    throw new Error(
+        "PDF.js load नहीं हुआ।"
     );
-
-    pdfjs.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
-
-    return pdfjs;
 
 }
 
