@@ -266,8 +266,7 @@ cropBtn.addEventListener("click", function(){
 
 /* CROP SELECTION */
 
-cropArea.addEventListener("pointerdown", function(e){
-
+imageArea.addEventListener("pointerdown", function(e){
     if(!cropMode) return;
 
     const rect = canvas.getBoundingClientRect();
@@ -286,7 +285,7 @@ cropArea.addEventListener("pointerdown", function(e){
 });
 
 
-cropArea.addEventListener("pointermove", function(e){
+imageArea.addEventListener("pointermove", function(e){
 
     if(!selecting || !cropMode) return;
 
@@ -311,7 +310,7 @@ cropArea.addEventListener("pointermove", function(e){
 });
 
 
-cropArea.addEventListener("pointerup", function(){
+imageArea.addEventListener("pointerup", function(){
 
     selecting = false;
 
