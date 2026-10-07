@@ -281,7 +281,7 @@ imageArea.addEventListener("pointerdown", function(e){
     cropBox.style.width = "0px";
     cropBox.style.height = "0px";
 
-    cropArea.setPointerCapture(e.pointerId);
+    imageArea.setPointerCapture(e.pointerId);
 });
 
 
