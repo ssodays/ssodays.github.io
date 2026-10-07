@@ -36,8 +36,10 @@ async function loadPDFs(){
         );
 
         if(pdfs.length === 0){
+
             pdfList.innerHTML =
                 "<p>अभी कोई PDF उपलब्ध नहीं है।</p>";
+
             return;
         }
 
@@ -48,7 +50,9 @@ async function loadPDFs(){
             const pdfURL =
                 "Pdf/" + encodeURIComponent(file.name);
 
-            const item = document.createElement("div");
+            const item =
+                document.createElement("div");
+
             item.className = "pdf-item";
 
             item.innerHTML = `
@@ -69,13 +73,16 @@ async function loadPDFs(){
             `;
 
             pdfList.appendChild(item);
+
         });
 
     }catch(error){
 
         pdfList.innerHTML =
             "<p>PDFs load नहीं हो पाईं।</p>";
+
     }
+
 }
 
 
@@ -95,6 +102,7 @@ function openPDF(url){
         encodeURIComponent(fullURL);
 
     viewer.style.display = "flex";
+
 }
 
 
@@ -109,6 +117,7 @@ function closePDF(){
     frame.src = "";
 
     viewer.style.display = "none";
+
 }
 
 
@@ -131,7 +140,7 @@ loadPDFs();
         toolsSection.querySelector(".card");
 
 
-    /* TOOL HTML */
+    /* ================= TOOL HTML ================= */
 
     card.insertAdjacentHTML("beforeend", `
 
@@ -150,7 +159,10 @@ loadPDFs();
                 style="display:none;"
             >
 
-                <div class="image-editor-area">
+                <div
+                    class="image-editor-area"
+                    id="imageEditorArea"
+                >
 
                     <img
                         id="editImage"
@@ -337,6 +349,9 @@ loadPDFs();
     const editor =
         document.getElementById("imageEditor");
 
+    const editorArea =
+        document.getElementById("imageEditorArea");
+
     const image =
         document.getElementById("editImage");
 
@@ -395,6 +410,8 @@ loadPDFs();
         document.getElementById("toolResult");
 
 
+    /* ================= VARIABLES ================= */
+
     let cropper = null;
 
     let currentRotation = 0;
@@ -402,121 +419,196 @@ loadPDFs();
     let currentObjectURL = null;
 
 
-    /* ================= PHOTO SELECT ================= */
+    /* ================================================= */
+    /* ============ FIT EDITOR TO PHOTO ================ */
+    /* ================================================= */
 
-    input.addEventListener("change", function(){
+    function fitEditorToImage(){
 
-        const file =
-            this.files[0];
-
-        if(!file) return;
-
-
-        if(!file.type.startsWith("image/")){
-
-            status.innerText =
-                "कृपया image file चुनें।";
-
+        if(
+            !image.naturalWidth ||
+            !image.naturalHeight
+        ){
             return;
         }
 
 
-        if(cropper){
+        const availableWidth =
+            editorArea.clientWidth;
 
-            cropper.destroy();
 
-            cropper = null;
+        if(!availableWidth){
+            return;
         }
 
 
-        if(currentObjectURL){
+        const ratio =
+            image.naturalHeight /
+            image.naturalWidth;
 
-            URL.revokeObjectURL(
-                currentObjectURL
+
+        const newHeight =
+            Math.round(
+                availableWidth * ratio
             );
 
+
+        editorArea.style.height =
+            newHeight + "px";
+
+    }
+
+
+    /* ================= PHOTO SELECT ================= */
+
+    input.addEventListener(
+        "change",
+        function(){
+
+            const file =
+                this.files[0];
+
+            if(!file) return;
+
+
+            if(
+                !file.type.startsWith("image/")
+            ){
+
+                status.innerText =
+                    "कृपया image file चुनें।";
+
+                return;
+            }
+
+
+            if(cropper){
+
+                cropper.destroy();
+
+                cropper = null;
+            }
+
+
+            if(currentObjectURL){
+
+                URL.revokeObjectURL(
+                    currentObjectURL
+                );
+
+            }
+
+
+            currentObjectURL =
+                URL.createObjectURL(file);
+
+
+            image.src =
+                currentObjectURL;
+
+
+            editor.style.display =
+                "block";
+
+
+            resizeControls.style.display =
+                "none";
+
+            convertControls.style.display =
+                "none";
+
+            processControls.style.display =
+                "none";
+
+
+            result.innerHTML = "";
+
+
+            window.finalImageCanvas =
+                null;
+
+
+            currentRotation = 0;
+
+            rotateSlider.value = 0;
+
+            rotateValue.innerText = "0";
+
+
+            image.onload = function(){
+
+                /* Important:
+                   Set editor height according
+                   to original photo ratio.
+                */
+
+                fitEditorToImage();
+
+
+                /* Create Cropper */
+
+                cropper =
+                    new Cropper(
+                        image,
+                        {
+
+                            viewMode: 1,
+
+                            dragMode: "move",
+
+                            autoCrop: true,
+
+                            responsive: true,
+
+                            restore: true,
+
+                            guides: true,
+
+                            center: true,
+
+                            highlight: true,
+
+                            cropBoxMovable: true,
+
+                            cropBoxResizable: true,
+
+                            toggleDragModeOnDblclick:
+                                false,
+
+                            zoomOnWheel: true,
+
+                            zoomOnTouch: true,
+
+                            background: false,
+
+                            aspectRatio: NaN,
+
+
+                            ready: function(){
+
+                                fitEditorToImage();
+
+
+                                status.innerText =
+                                    "Photo तैयार है। Crop box को adjust करें, zoom/move करें या rotate करें।";
+
+                            }
+
+                        }
+                    );
+
+            };
+
+
+            image.onerror = function(){
+
+                status.innerText =
+                    "Photo load नहीं हो पाई।";
+
+            };
+
         }
-
-
-        currentObjectURL =
-            URL.createObjectURL(file);
-
-
-        image.src =
-            currentObjectURL;
-
-
-        editor.style.display =
-            "block";
-
-
-        resizeControls.style.display =
-            "none";
-
-        convertControls.style.display =
-            "none";
-
-        processControls.style.display =
-            "none";
-
-
-        result.innerHTML = "";
-
-
-        currentRotation = 0;
-
-        rotateSlider.value = 0;
-
-        rotateValue.innerText = "0";
-
-
-        image.onload = function(){
-
-            cropper =
-                new Cropper(image, {
-
-                    viewMode: 1,
-
-                    dragMode: "move",
-
-                    autoCrop: true,
-
-                    responsive: true,
-
-                    restore: true,
-
-                    guides: true,
-
-                    center: true,
-
-                    highlight: true,
-
-                    cropBoxMovable: true,
-
-                    cropBoxResizable: true,
-
-                    toggleDragModeOnDblclick: false,
-
-                    zoomOnWheel: true,
-
-                    zoomOnTouch: true,
-
-                    background: false,
-
-                    aspectRatio: NaN,
-
-                    ready: function(){
-
-                        status.innerText =
-                            "Photo तैयार है। Crop box को adjust करें, zoom/move करें या rotate करें।";
-
-                    }
-
-                });
-
-        };
-
-    });
+    );
 
 
     /* ================= ROTATE LEFT ================= */
@@ -527,6 +619,7 @@ loadPDFs();
 
             if(!cropper) return;
 
+
             if(currentRotation > -180){
 
                 currentRotation--;
@@ -535,11 +628,14 @@ loadPDFs();
                     currentRotation
                 );
 
+
                 rotateSlider.value =
                     currentRotation;
 
+
                 rotateValue.innerText =
                     currentRotation;
+
             }
 
         }
@@ -554,6 +650,7 @@ loadPDFs();
 
             if(!cropper) return;
 
+
             if(currentRotation < 180){
 
                 currentRotation++;
@@ -562,11 +659,14 @@ loadPDFs();
                     currentRotation
                 );
 
+
                 rotateSlider.value =
                     currentRotation;
 
+
                 rotateValue.innerText =
                     currentRotation;
+
             }
 
         }
@@ -581,15 +681,21 @@ loadPDFs();
 
             if(!cropper) return;
 
+
             currentRotation =
-                parseInt(this.value);
+                parseInt(
+                    this.value
+                );
+
 
             cropper.rotateTo(
                 currentRotation
             );
 
+
             rotateValue.innerText =
                 currentRotation;
+
         }
     );
 
@@ -630,13 +736,22 @@ loadPDFs();
 
             if(!cropper) return;
 
+
             cropper.reset();
+
 
             currentRotation = 0;
 
+
             rotateSlider.value = 0;
 
-            rotateValue.innerText = "0";
+
+            rotateValue.innerText =
+                "0";
+
+
+            fitEditorToImage();
+
 
             status.innerText =
                 "Editor reset हो गया।";
@@ -663,9 +778,11 @@ loadPDFs();
             const croppedCanvas =
                 cropper.getCroppedCanvas({
 
-                    imageSmoothingEnabled: true,
+                    imageSmoothingEnabled:
+                        true,
 
-                    imageSmoothingQuality: "high"
+                    imageSmoothingQuality:
+                        "high"
 
                 });
 
@@ -682,6 +799,7 @@ loadPDFs();
             widthInput.value =
                 croppedCanvas.width;
 
+
             heightInput.value =
                 croppedCanvas.height;
 
@@ -689,32 +807,39 @@ loadPDFs();
             resizeControls.style.display =
                 "flex";
 
+
             convertControls.style.display =
                 "flex";
+
 
             processControls.style.display =
                 "flex";
 
 
-            /* Store cropped canvas */
-
             window.finalImageCanvas =
                 croppedCanvas;
 
-
-            /* Destroy editor */
 
             cropper.destroy();
 
             cropper = null;
 
 
-            /* Show cropped result */
+            /* Show cropped image */
 
             image.src =
                 croppedCanvas.toDataURL(
                     "image/png"
                 );
+
+
+            /* Fit area to cropped image */
+
+            image.onload = function(){
+
+                fitEditorToImage();
+
+            };
 
 
             status.innerText =
@@ -748,6 +873,7 @@ loadPDFs();
                     widthInput.value
                 );
 
+
             let height =
                 parseInt(
                     heightInput.value
@@ -759,8 +885,10 @@ loadPDFs();
                 width =
                     sourceCanvas.width;
 
+
                 height =
                     sourceCanvas.height;
+
             }
 
 
@@ -795,6 +923,7 @@ loadPDFs();
             outCanvas.width =
                 width;
 
+
             outCanvas.height =
                 height;
 
@@ -810,12 +939,14 @@ loadPDFs();
                 ctx.fillStyle =
                     "#ffffff";
 
+
                 ctx.fillRect(
                     0,
                     0,
                     width,
                     height
                 );
+
             }
 
 
@@ -858,28 +989,35 @@ loadPDFs();
                 for(
                     let i = 0;
                     i < 15 &&
-                    blob.size > targetKB * 1024;
+                    blob.size >
+                    targetKB * 1024;
                     i++
                 ){
 
                     quality -= 0.05;
 
-                    if(quality < 0.05){
+
+                    if(
+                        quality < 0.05
+                    ){
 
                         quality = 0.05;
+
                     }
 
 
                     blob =
                         await canvasToBlob(
                             outCanvas,
+                               outCanvas,
                             format,
                             quality
                         );
+
                 }
 
 
-                /* Reduce dimensions if needed */
+                /* ================= REDUCE DIMENSIONS ================= */
 
                 let attempts = 0;
 
@@ -911,6 +1049,7 @@ loadPDFs();
                     outCanvas.width =
                         width;
 
+
                     outCanvas.height =
                         height;
 
@@ -929,12 +1068,14 @@ loadPDFs();
                         ctx.fillStyle =
                             "#ffffff";
 
+
                         ctx.fillRect(
                             0,
                             0,
                             width,
                             height
                         );
+
                     }
 
 
@@ -956,9 +1097,14 @@ loadPDFs();
 
 
                     attempts++;
+
                 }
 
+
             }else{
+
+
+                /* ================= NORMAL CONVERT ================= */
 
                 blob =
                     await canvasToBlob(
@@ -966,99 +1112,115 @@ loadPDFs();
                         format,
                         0.90
                     );
+
             }
 
 
-        /* ================= DOWNLOAD ================= */
+            /* ================= DOWNLOAD ================= */
 
-if(currentObjectURL){
+            if(currentObjectURL){
 
-    URL.revokeObjectURL(
-        currentObjectURL
-    );
-}
+                URL.revokeObjectURL(
+                    currentObjectURL
+                );
 
-
-currentObjectURL =
-    URL.createObjectURL(
-        blob
-    );
+            }
 
 
-const extension =
-    format === "image/png"
-        ? "png"
-        : format === "image/webp"
-            ? "webp"
-            : "jpg";
+            currentObjectURL =
+                URL.createObjectURL(
+                    blob
+                );
 
 
-result.innerHTML = `
-
-    <div>
-
-        <b>✅ Result Ready</b>
-
-        <br><br>
-
-        Size:
-        ${width} × ${height} px
-
-        <br>
-
-        File Size:
-        ${Math.round(
-            blob.size / 1024
-        )} KB
-
-    </div>
+            const extension =
+                format === "image/png"
+                    ? "png"
+                    : format === "image/webp"
+                        ? "webp"
+                        : "jpg";
 
 
-    <a
-        class="btn"
-        href="${currentObjectURL}"
-        download="SSODAYS-image.${extension}"
-    >
+            result.innerHTML = `
 
-        ⬇️ Download Image
+                <div>
 
-    </a>
+                    <b>✅ Result Ready</b>
 
-`;
+                    <br><br>
+
+                    Size:
+                    ${width} × ${height} px
+
+                    <br>
+
+                    File Size:
+                    ${Math.round(
+                        blob.size / 1024
+                    )} KB
+
+                </div>
 
 
-status.innerText =
-    "Image तैयार है ✅";
+                <a
+                    class="btn"
+                    href="${currentObjectURL}"
+                    download="SSODAYS-image.${extension}"
+                >
 
-}
-);
+                    ⬇️ Download Image
+
+                </a>
+
+            `;
 
 
-/* ================= CANVAS TO BLOB ================= */
+            if(
+                targetKB &&
+                blob.size >
+                targetKB * 1024
+            ){
 
-function canvasToBlob(
-    canvas,
-    format,
-    quality
-){
+                status.innerText =
+                    "Image तैयार है, लेकिन Target KB से थोड़ा ज्यादा है।";
 
-    return new Promise(
-        function(resolve){
+            }else{
 
-            canvas.toBlob(
-                function(blob){
+                status.innerText =
+                    "Image तैयार है ✅";
 
-                    resolve(blob);
-
-                },
-                format,
-                quality
-            );
+            }
 
         }
+
     );
 
-}
+
+    /* ================= CANVAS TO BLOB ================= */
+
+    function canvasToBlob(
+        canvas,
+        format,
+        quality
+    ){
+
+        return new Promise(
+            function(resolve){
+
+                canvas.toBlob(
+                    function(blob){
+
+                        resolve(blob);
+
+                    },
+                    format,
+                    quality
+                );
+
+            }
+        );
+
+    }
 
 
 })();
