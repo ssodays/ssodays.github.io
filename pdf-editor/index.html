@@ -2,15 +2,13 @@
 <html lang="en">
 
 <head>
+
 <meta charset="UTF-8">
 
 <meta name="viewport"
-content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+content="width=device-width,initial-scale=1,maximum-scale=1">
 
 <title>SSODAYS PDF Editor</title>
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css">
 
 <style>
 
@@ -33,63 +31,89 @@ body{
 }
 
 
-/* TOP BAR */
+/* ================= TOP BAR ================= */
 
 .topbar{
+
     height:58px;
     flex:0 0 58px;
+
     background:#174b7d;
     color:white;
+
     display:flex;
     align-items:center;
     justify-content:space-between;
+
     padding:0 15px;
+
     font-size:20px;
     font-weight:bold;
 }
 
 .topbar button{
+
     background:white;
+    color:#222;
+
     border:0;
     border-radius:7px;
+
     padding:9px 14px;
+
     font-size:15px;
+
     cursor:pointer;
 }
 
 
-/* EDITOR TOOLS */
+/* ================= TOOL BAR ================= */
 
 .editorbar{
+
     min-height:52px;
+
     background:#323136;
+
     border-bottom:1px solid #111;
+
     display:flex;
     align-items:center;
+
     gap:5px;
+
     padding:5px;
+
     overflow-x:auto;
     white-space:nowrap;
 }
 
 .editorbar button,
 .editorbar label{
+
     height:40px;
     min-width:40px;
+
     border:0;
     border-radius:5px;
+
     background:#3d3c42;
     color:#eee;
+
     font-size:15px;
+
     cursor:pointer;
+
     display:inline-flex;
     align-items:center;
     justify-content:center;
+
     padding:0 10px;
 }
 
 .editorbar button:hover,
 .editorbar label:hover{
+
     background:#55535a;
 }
 
@@ -98,181 +122,189 @@ body{
 }
 
 .sep{
+
     height:30px;
     width:1px;
+
     background:#666;
+
     margin:0 3px;
 }
 
 #pageInput{
+
     width:55px;
     height:36px;
+
     text-align:center;
 }
 
 #textSize{
+
     width:55px;
     height:36px;
+
     background:#3d3c42;
     color:white;
+
     border:1px solid #666;
     border-radius:5px;
+
+    text-align:center;
 }
 
 
-/* PDF VIEWER */
+/* ================= VIEWER ================= */
 
 #viewerContainer{
+
     position:relative;
+
     flex:1;
+
     overflow:hidden;
+
     background:#29282d;
 }
 
 #pdfFrame{
+
     width:100%;
     height:100%;
+
     border:0;
-    background:#29282d;
+
+    background:white;
+
     display:none;
 }
 
 #empty{
+
     position:absolute;
+
     inset:0;
+
     display:flex;
+
     align-items:center;
     justify-content:center;
+
     color:#aaa;
+
     font-size:17px;
+
     text-align:center;
+
     padding:25px;
 }
 
 #emptyBox{
+
     background:#333239;
+
     border:1px solid #4b4a50;
+
     border-radius:12px;
+
     padding:30px 22px;
+
     max-width:420px;
 }
 
 #emptyBox b{
+
     display:block;
+
     color:white;
+
     font-size:24px;
+
     margin-bottom:12px;
 }
 
 
-/* STATUS */
+/* ================= STATUS ================= */
 
 #status{
+
     position:fixed;
+
     left:50%;
     bottom:18px;
+
     transform:translateX(-50%);
+
     background:#111;
-    color:#fff;
+
+    color:white;
+
     padding:8px 14px;
+
     border-radius:20px;
+
     font-size:14px;
+
     z-index:100;
+
     display:none;
 }
 
 
-/* ANNOTATION AREA */
+/* ================= MOBILE ================= */
 
-.annotationOverlay{
-    position:absolute;
-    left:0;
-    top:0;
-    right:0;
-    bottom:0;
-    z-index:20;
-    pointer-events:none;
-}
+@media(max-width:600px){
 
-.annotationCanvas{
-    position:absolute;
-    left:0;
-    top:0;
-    width:100%;
-    height:100%;
-    z-index:21;
-    pointer-events:none;
-}
+    .topbar{
 
-.annotationItem{
-    position:absolute;
-    z-index:22;
-    pointer-events:auto;
-    user-select:none;
-    touch-action:none;
-}
+        height:52px;
+        flex-basis:52px;
 
-.textItem{
-    padding:2px 4px;
-    background:transparent;
-    white-space:nowrap;
-    font-family:Arial,sans-serif;
-    color:#111;
-    cursor:move;
-}
+        font-size:17px;
 
-.imageItem{
-    border:1px dashed #1976d2;
-    cursor:move;
-    overflow:hidden;
-    background:rgba(255,255,255,.05);
-}
+        padding:0 10px;
+    }
 
-.imageItem img{
-    display:block;
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    pointer-events:none;
-}
+    .topbar button{
 
-.resizeHandle{
-    position:absolute;
-    width:14px;
-    height:14px;
-    right:-7px;
-    bottom:-7px;
-    background:#1976d2;
-    border:2px solid white;
-    border-radius:50%;
-    cursor:nwse-resize;
-}
+        padding:7px 10px;
+        font-size:13px;
+    }
 
-.deleteHandle{
-    position:absolute;
-    right:-10px;
-    top:-10px;
-    width:20px;
-    height:20px;
-    border:0;
-    border-radius:50%;
-    background:#d32f2f;
-    color:white;
-    cursor:pointer;
+    .editorbar{
+
+        min-height:48px;
+        padding:4px;
+    }
+
+    .editorbar button,
+    .editorbar label{
+
+        height:38px;
+        min-width:38px;
+
+        padding:0 8px;
+
+        font-size:14px;
+    }
+
 }
 
 </style>
+
 </head>
 
 
 <body>
 
 
-<!-- TOP -->
+<!-- ================= TOP ================= -->
 
 <div class="topbar">
 
-    <span>📄 PDF Editor</span>
+    <span>
+        📄 PDF Editor
+    </span>
 
     <button id="closeBtn">
         ✕ Close
@@ -282,9 +314,12 @@ body{
 
 
 
-<!-- TOOLS -->
+<!-- ================= TOOLS ================= -->
 
 <div class="editorbar">
+
+
+    <!-- PDF OPEN -->
 
     <label title="Open PDF">
 
@@ -299,61 +334,102 @@ body{
     </label>
 
 
-    <button id="prevBtn">
+
+    <!-- PAGE -->
+
+    <button id="prevBtn"
+            title="Previous Page">
+
         ◀
+
     </button>
 
 
     <input
         id="pageInput"
-        value="1"
-        min="1"
         type="number"
+        min="1"
+        value="1"
     >
 
 
     <span style="color:#ddd">
-        / <span id="pageCount">0</span>
+
+        /
+        <span id="pageCount">
+            0
+        </span>
+
     </span>
 
 
-    <button id="nextBtn">
+    <button id="nextBtn"
+            title="Next Page">
+
         ▶
+
     </button>
 
 
-    <button id="zoomOutBtn">
+
+    <!-- ZOOM -->
+
+    <button id="zoomOutBtn"
+            title="Zoom Out">
+
         −
+
     </button>
 
 
-    <button id="zoomInBtn">
+    <button id="zoomInBtn"
+            title="Zoom In">
+
         +
+
     </button>
 
 
-    <button id="fitBtn">
+    <button id="fitBtn"
+            title="Fit">
+
         ↔
+
     </button>
+
 
 
     <span class="sep"></span>
 
 
-    <button id="pencilBtn">
+
+    <!-- EDITING TOOLS -->
+
+    <button id="pencilBtn"
+            title="Pencil">
+
         ✎
+
     </button>
 
 
-    <button id="highlightBtn">
+    <button id="highlightBtn"
+            title="Highlight">
+
         🖍
+
     </button>
 
 
-    <button id="textBtn">
+    <button id="textBtn"
+            title="Text">
+
         T
+
     </button>
 
+
+    <!-- IMAGE -->
 
     <label title="Add Image">
 
@@ -368,26 +444,47 @@ body{
     </label>
 
 
-    <button id="undoBtn">
+    <!-- UNDO -->
+
+    <button id="undoBtn"
+            title="Undo">
+
         ↶
+
     </button>
 
 
-    <button id="clearBtn">
+    <!-- CLEAR -->
+
+    <button id="clearBtn"
+            title="Clear">
+
         🗑
+
     </button>
 
 
-    <button id="downloadBtn">
+    <!-- DOWNLOAD -->
+
+    <button id="downloadBtn"
+            title="Download">
+
         ⬇
+
     </button>
+
 
 
     <span class="sep"></span>
 
 
-    <span style="color:#bbb;font-size:13px">
+    <span style="
+        color:#bbb;
+        font-size:13px;
+    ">
+
         Text
+
     </span>
 
 
@@ -403,9 +500,10 @@ body{
 
 
 
-<!-- VIEWER -->
+<!-- ================= PDF VIEWER ================= -->
 
 <div id="viewerContainer">
+
 
     <iframe
         id="pdfFrame"
@@ -415,33 +513,49 @@ body{
 
     <div id="empty">
 
+
         <div id="emptyBox">
+
 
             <b>
                 PDF Viewer
             </b>
 
-            PDF चुनें और browser में edit करें।
+
+            PDF चुनें और browser में देखें।
+
 
             <br><br>
+
 
             📂 ऊपर
-            <b style="display:inline;font-size:18px">
+            <b style="
+                display:inline;
+                font-size:18px;
+            ">
                 PDF
             </b>
+
             बटन दबाकर PDF चुनें।
+
 
             <br><br>
 
-            <span style="font-size:14px">
+
+            <span style="
+                font-size:14px;
+            ">
 
                 PDF server पर upload नहीं होगी।
 
             </span>
 
+
         </div>
 
+
     </div>
+
 
 </div>
 
@@ -451,142 +565,189 @@ body{
 
 
 
-<!-- PDF.JS -->
+<!-- ================= PDF LIB ================= -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="
+https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js
+"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 
 
 <script>
 
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-
-const $ = id =>
-document.getElementById(id);
-
+/* ================= VARIABLES ================= */
 
 let currentFile = null;
 
-let pdfBytes = null;
-
-let pdfDocument = null;
-
 let currentPDFObjectURL = null;
+
+let pdfBytes = null;
 
 let currentPage = 1;
 
-let zoom = 1;
-
-let annotations = {};
-
-let undoStack = [];
+let totalPages = 0;
 
 let selectedTool = null;
 
+let zoomLevel = 1;
+
+let undoStack = [];
 
 
-/* ================= TOAST ================= */
+
+/* ================= SHORTCUT ================= */
+
+const $ = id =>
+    document.getElementById(id);
+
+
+
+/* ================= STATUS ================= */
 
 function toast(message){
 
-    const status = $("status");
+    const box =
+        $("status");
 
-    status.textContent = message;
+    box.textContent =
+        message;
 
-    status.style.display = "block";
+    box.style.display =
+        "block";
 
-    clearTimeout(window.toastTimer);
+
+    clearTimeout(
+        window.toastTimer
+    );
+
 
     window.toastTimer =
         setTimeout(()=>{
-            status.style.display = "none";
+
+            box.style.display =
+                "none";
+
         },2500);
+
 }
 
 
 
-/* ================= LOAD PDF ================= */
+/* ================= OPEN PDF ================= */
 
 async function loadPDF(file){
 
     if(!file){
 
-        toast("PDF file चुनें");
+        toast(
+            "PDF file चुनें"
+        );
 
         return;
     }
 
 
-    const name =
-        (file.name || "").toLowerCase();
+    const fileName =
+        (
+            file.name || ""
+        ).toLowerCase();
 
-    const type =
-        (file.type || "").toLowerCase();
 
+    const fileType =
+        (
+            file.type || ""
+        ).toLowerCase();
+
+
+    /*
+       Android में कभी-कभी
+       MIME type खाली आता है।
+       इसलिए filename भी check कर रहे हैं।
+    */
 
     if(
-        !name.endsWith(".pdf") &&
-        type !== "application/pdf" &&
-        type !== "application/octet-stream" &&
-        type !== ""
+
+        !fileName.endsWith(".pdf")
+
+        &&
+
+        fileType !== "application/pdf"
+
+        &&
+
+        fileType !== "application/octet-stream"
+
+        &&
+
+        fileType !== ""
+
     ){
 
-        toast("सिर्फ PDF file चुनें");
+        alert(
+            "कृपया PDF file ही चुनें।"
+        );
 
         return;
     }
+
 
 
     try{
 
-        toast("PDF load हो रही है...");
+
+        toast(
+            "PDF load हो रही है..."
+        );
 
 
-        currentFile = file;
+        /*
+           Read file locally.
+           Server पर upload नहीं होगा।
+        */
+
+        const buffer =
+            await file.arrayBuffer();
 
 
         pdfBytes =
-            new Uint8Array(
-                await file.arrayBuffer()
-            );
+            new Uint8Array(buffer);
 
 
-        /* CHECK PDF */
+        /*
+           Check PDF signature.
+        */
 
-        const header =
+        const firstBytes =
             new TextDecoder()
             .decode(
                 pdfBytes.slice(0,5)
             );
 
 
-        if(header !== "%PDF-"){
+        if(
+            firstBytes !== "%PDF-"
+        ){
 
-            throw new Error(
-                "Not a valid PDF"
+            alert(
+                "यह valid PDF file नहीं है।"
             );
 
+            return;
         }
 
 
-        /* RESET */
-
-        annotations = {};
-
-        undoStack = [];
-
-        currentPage = 1;
+        currentFile =
+            file;
 
 
-        /* LOCAL OBJECT URL */
+        /*
+           Previous local URL remove.
+        */
 
-        if(currentPDFObjectURL){
+        if(
+            currentPDFObjectURL
+        ){
 
             URL.revokeObjectURL(
                 currentPDFObjectURL
@@ -595,30 +756,42 @@ async function loadPDF(file){
         }
 
 
-        currentPDFObjectURL =
-            URL.createObjectURL(
+        /*
+           Create local browser URL.
+        */
 
-                new Blob(
-                    [pdfBytes],
-                    {
-                        type:"application/pdf"
-                    }
-                )
-
+        const blob =
+            new Blob(
+                [pdfBytes],
+                {
+                    type:
+                    "application/pdf"
+                }
             );
 
 
-        /* PDF.JS VIEWER */
+        currentPDFObjectURL =
+            URL.createObjectURL(
+                blob
+            );
+
+
+        /*
+           IMPORTANT:
+
+           PDF को बाहरी Mozilla
+           viewer में नहीं भेज रहे।
+
+           Direct browser PDF viewer
+           में local PDF खोल रहे हैं।
+        */
 
         const frame =
             $("pdfFrame");
 
 
         frame.src =
-            "https://mozilla.github.io/pdf.js/web/viewer.html?file=" +
-            encodeURIComponent(
-                currentPDFObjectURL
-            );
+            currentPDFObjectURL;
 
 
         frame.style.display =
@@ -629,37 +802,48 @@ async function loadPDF(file){
             "none";
 
 
-        /* PDF.JS DOCUMENT */
+        /*
+           Page count निकालने की कोशिश।
+           PDF.js की जरूरत नहीं।
+        */
 
-        const task =
-            pdfjsLib.getDocument({
-                data:pdfBytes
-            });
-
-
-        pdfDocument =
-            await task.promise;
+        totalPages =
+            countPDFPages(
+                pdfBytes
+            );
 
 
         $("pageCount").textContent =
-            pdfDocument.numPages;
+            totalPages || "?";
 
 
         $("pageInput").value =
             1;
 
 
-        toast("PDF तैयार है");
+        currentPage =
+            1;
+
+
+        toast(
+            "PDF खुल गई"
+        );
 
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
-        toast("PDF load नहीं हुई");
 
         alert(
-            "PDF load नहीं हो पाई। कृपया सही PDF file चुनें।"
+            "PDF खोलते समय error आया।"
+        );
+
+
+        toast(
+            "PDF open नहीं हुई"
         );
 
     }
@@ -668,21 +852,74 @@ async function loadPDF(file){
 
 
 
-/* ================= PDF INPUT ================= */
+/* ================= PDF PAGE COUNT ================= */
+
+/*
+   Simple page counter.
+   यह केवल page navigation display
+   के लिए है।
+*/
+
+function countPDFPages(bytes){
+
+    try{
+
+        const text =
+            new TextDecoder(
+                "latin1"
+            ).decode(bytes);
+
+
+        const matches =
+            text.match(
+                /\/Type\s*\/Page\b/g
+            );
+
+
+        if(matches){
+
+            return matches.length;
+
+        }
+
+    }catch(e){
+
+        console.warn(e);
+
+    }
+
+
+    return 0;
+
+}
+
+
+
+/* ================= FILE INPUT ================= */
 
 $("pdfInput")
 .addEventListener(
     "change",
-    async e=>{
+    async function(event){
 
         const file =
-            e.target.files[0];
+            event.target.files[0];
 
-        e.target.value = "";
+
+        /*
+           Input reset इसलिए
+           ताकि same PDF दोबारा भी
+           select की जा सके।
+        */
+
+        event.target.value = "";
+
 
         if(file){
 
-            await loadPDF(file);
+            await loadPDF(
+                file
+            );
 
         }
 
@@ -691,68 +928,112 @@ $("pdfInput")
 
 
 
-/* ================= PAGE ================= */
+/* ================= PREVIOUS ================= */
 
-$("prevBtn").onclick = ()=>{
+$("prevBtn").onclick =
+function(){
 
-    if(!pdfDocument)
-        return;
+    if(!currentFile){
 
-    currentPage =
-        Math.max(
-            1,
-            currentPage - 1
+        toast(
+            "पहले PDF चुनें"
         );
 
-    $("pageInput").value =
-        currentPage;
+        return;
+    }
+
+
+    if(
+        currentPage > 1
+    ){
+
+        currentPage--;
+
+        $("pageInput").value =
+            currentPage;
+
+        toast(
+            "Page " +
+            currentPage
+        );
+
+    }
 
 };
 
 
 
-$("nextBtn").onclick = ()=>{
+/* ================= NEXT ================= */
 
-    if(!pdfDocument)
-        return;
+$("nextBtn").onclick =
+function(){
 
-    currentPage =
-        Math.min(
-            pdfDocument.numPages,
-            currentPage + 1
+    if(!currentFile){
+
+        toast(
+            "पहले PDF चुनें"
         );
 
-    $("pageInput").value =
-        currentPage;
+        return;
+    }
+
+
+    if(
+        totalPages &&
+        currentPage < totalPages
+    ){
+
+        currentPage++;
+
+        $("pageInput").value =
+            currentPage;
+
+        toast(
+            "Page " +
+            currentPage
+        );
+
+    }
 
 };
 
 
+
+/* ================= PAGE INPUT ================= */
 
 $("pageInput")
 .addEventListener(
     "change",
-    ()=>{
+    function(){
 
-        if(!pdfDocument)
+        if(!currentFile)
             return;
+
 
         let page =
             Number(
                 $("pageInput").value
-            ) || 1;
-
-        page =
-            Math.max(
-                1,
-                Math.min(
-                    pdfDocument.numPages,
-                    page
-                )
             );
+
+
+        if(!page || page < 1)
+            page = 1;
+
+
+        if(
+            totalPages &&
+            page > totalPages
+        ){
+
+            page =
+                totalPages;
+
+        }
+
 
         currentPage =
             page;
+
 
         $("pageInput").value =
             page;
@@ -764,37 +1045,32 @@ $("pageInput")
 
 /* ================= ZOOM ================= */
 
-$("zoomInBtn").onclick = ()=>{
+$("zoomInBtn").onclick =
+function(){
 
-    if(!pdfDocument)
-        return;
+    if(!currentFile){
 
-    zoom += .1;
-
-    toast(
-        "Zoom " +
-        Math.round(zoom*100) +
-        "%"
-    );
-
-};
-
-
-
-$("zoomOutBtn").onclick = ()=>{
-
-    if(!pdfDocument)
-        return;
-
-    zoom =
-        Math.max(
-            .5,
-            zoom-.1
+        toast(
+            "पहले PDF चुनें"
         );
 
+        return;
+    }
+
+
+    zoomLevel += 0.1;
+
+
+    /*
+       Browser viewer का zoom
+       browser controlled है।
+    */
+
     toast(
         "Zoom " +
-        Math.round(zoom*100) +
+        Math.round(
+            zoomLevel * 100
+        ) +
         "%"
     );
 
@@ -802,44 +1078,135 @@ $("zoomOutBtn").onclick = ()=>{
 
 
 
-$("fitBtn").onclick = ()=>{
+$("zoomOutBtn").onclick =
+function(){
 
-    if(!pdfDocument)
+    if(!currentFile){
+
+        toast(
+            "पहले PDF चुनें"
+        );
+
         return;
-
-    toast("Fit width");
-
-};
+    }
 
 
-
-/* ================= TOOLS ================= */
-
-$("pencilBtn").onclick = ()=>{
-
-    selectedTool = "pencil";
-
-    toast("✎ Pencil selected");
-
-};
+    zoomLevel =
+        Math.max(
+            0.5,
+            zoomLevel - 0.1
+        );
 
 
-
-$("highlightBtn").onclick = ()=>{
-
-    selectedTool = "highlight";
-
-    toast("🖍 Highlight selected");
+    toast(
+        "Zoom " +
+        Math.round(
+            zoomLevel * 100
+        ) +
+        "%"
+    );
 
 };
 
 
 
-$("textBtn").onclick = ()=>{
+$("fitBtn").onclick =
+function(){
 
-    selectedTool = "text";
+    if(!currentFile){
 
-    toast("T Text selected");
+        toast(
+            "पहले PDF चुनें"
+        );
+
+        return;
+    }
+
+
+    toast(
+        "Browser PDF viewer में Fit option इस्तेमाल करें"
+    );
+
+};
+
+
+
+/* ================= PENCIL ================= */
+
+$("pencilBtn").onclick =
+function(){
+
+    if(!currentFile){
+
+        toast(
+            "पहले PDF चुनें"
+        );
+
+        return;
+    }
+
+
+    selectedTool =
+        "pencil";
+
+
+    toast(
+        "✎ Pencil selected"
+    );
+
+};
+
+
+
+/* ================= HIGHLIGHT ================= */
+
+$("highlightBtn").onclick =
+function(){
+
+    if(!currentFile){
+
+        toast(
+            "पहले PDF चुनें"
+        );
+
+        return;
+    }
+
+
+    selectedTool =
+        "highlight";
+
+
+    toast(
+        "🖍 Highlight selected"
+    );
+
+};
+
+
+
+/* ================= TEXT ================= */
+
+$("textBtn").onclick =
+function(){
+
+    if(!currentFile){
+
+        toast(
+            "पहले PDF चुनें"
+        );
+
+        return;
+    }
+
+
+    selectedTool =
+        "text";
+
+
+    toast(
+        "T Text selected"
+    );
 
 };
 
@@ -850,20 +1217,36 @@ $("textBtn").onclick = ()=>{
 $("imageInput")
 .addEventListener(
     "change",
-    e=>{
+    function(event){
 
         const file =
-            e.target.files[0];
+            event.target.files[0];
 
-        e.target.value = "";
 
-        if(file){
+        event.target.value = "";
 
-            toast(
-                "Image selected"
+
+        if(!file)
+            return;
+
+
+        if(
+            !file.type.startsWith(
+                "image/"
+            )
+        ){
+
+            alert(
+                "सिर्फ image चुनें।"
             );
 
+            return;
         }
+
+
+        toast(
+            "Image selected"
+        );
 
     }
 );
@@ -872,13 +1255,18 @@ $("imageInput")
 
 /* ================= UNDO ================= */
 
-$("undoBtn").onclick = ()=>{
+$("undoBtn").onclick =
+function(){
 
-    if(undoStack.length){
+    if(
+        undoStack.length
+    ){
 
         undoStack.pop();
 
-        toast("Undo");
+        toast(
+            "Undo"
+        );
 
     }else{
 
@@ -894,21 +1282,30 @@ $("undoBtn").onclick = ()=>{
 
 /* ================= CLEAR ================= */
 
-$("clearBtn").onclick = ()=>{
+$("clearBtn").onclick =
+function(){
 
-    if(!pdfDocument)
+    if(!currentFile){
+
+        toast(
+            "पहले PDF चुनें"
+        );
+
         return;
+    }
+
 
     if(
         confirm(
-            "Current page की editing हटाएं?"
+            "क्या current editing हटानी है?"
         )
     ){
 
-        annotations[currentPage] = [];
+        undoStack = [];
+
 
         toast(
-            "Annotations cleared"
+            "Editing clear हो गई"
         );
 
     }
@@ -920,7 +1317,7 @@ $("clearBtn").onclick = ()=>{
 /* ================= DOWNLOAD ================= */
 
 $("downloadBtn").onclick =
-async ()=>{
+async function(){
 
     if(!pdfBytes){
 
@@ -934,14 +1331,23 @@ async ()=>{
 
     try{
 
+
         toast(
             "PDF तैयार हो रही है..."
         );
 
 
+        /*
+           Original PDF को
+           PDF-LIB से save करते हैं।
+        */
+
         const pdfDoc =
-            await PDFLib.PDFDocument
-            .load(pdfBytes);
+            await PDFLib
+            .PDFDocument
+            .load(
+                pdfBytes
+            );
 
 
         const output =
@@ -959,39 +1365,56 @@ async ()=>{
 
 
         const url =
-            URL.createObjectURL(blob);
+            URL.createObjectURL(
+                blob
+            );
 
 
         const a =
-            document.createElement("a");
+            document.createElement(
+                "a"
+            );
 
 
-        a.href = url;
+        a.href =
+            url;
 
 
-        const original =
-            currentFile?.name ||
+        const originalName =
+            currentFile &&
+            currentFile.name
+            ?
+            currentFile.name
+            :
             "document.pdf";
 
 
         a.download =
-            original.replace(
+            originalName.replace(
                 /\.pdf$/i,
                 ""
             ) +
             "_edited.pdf";
 
 
-        document.body.appendChild(a);
+        document.body.appendChild(
+            a
+        );
+
 
         a.click();
+
 
         a.remove();
 
 
         setTimeout(
-            ()=>{
-                URL.revokeObjectURL(url);
+            function(){
+
+                URL.revokeObjectURL(
+                    url
+                );
+
             },
             3000
         );
@@ -1004,7 +1427,10 @@ async ()=>{
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
+
 
         alert(
             "PDF download करते समय error आया।"
@@ -1018,13 +1444,17 @@ async ()=>{
 
 /* ================= CLOSE ================= */
 
-$("closeBtn").onclick = ()=>{
+$("closeBtn").onclick =
+function(){
 
-    if(currentPDFObjectURL){
+    if(
+        currentPDFObjectURL
+    ){
 
         URL.revokeObjectURL(
             currentPDFObjectURL
         );
+
 
         currentPDFObjectURL =
             null;
@@ -1032,7 +1462,8 @@ $("closeBtn").onclick = ()=>{
     }
 
 
-    $("pdfFrame").src = "";
+    $("pdfFrame").src =
+        "";
 
 
     location.href =
@@ -1041,8 +1472,29 @@ $("closeBtn").onclick = ()=>{
 };
 
 
+
+/* ================= PAGE LEAVE ================= */
+
+window.addEventListener(
+    "beforeunload",
+    function(){
+
+        if(
+            currentPDFObjectURL
+        ){
+
+            URL.revokeObjectURL(
+                currentPDFObjectURL
+            );
+
+        }
+
+    }
+);
+
+
 </script>
 
 </body>
 
-  </html>
+    </html>
