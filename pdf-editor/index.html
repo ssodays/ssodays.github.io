@@ -1371,15 +1371,230 @@ function selectTool(name){
 }
 
 
+/* ================= MOBILE PINCH ZOOM ================= */
+
+let pinchStartDistance = 0;
+let pinchStartScale = 1;
+let pinchZooming = false;
+
+
+/* दो उँगलियों की दूरी */
+
+function getTouchDistance(e){
+
+    const dx =
+        e.touches[0].clientX -
+        e.touches[1].clientX;
+
+    const dy =
+        e.touches[0].clientY -
+        e.touches[1].clientY;
+
+    return Math.sqrt(
+        dx * dx + dy * dy
+    );
+
+}
+
+
+/* PINCH START */
+
+$("viewerContainer").addEventListener(
+    "touchstart",
+    function(e){
+
+        if(e.touches.length === 2){
+
+            pinchZooming = true;
+
+            pinchStartDistance =
+                getTouchDistance(e);
+
+            pinchStartScale =
+                scale;
+
+            e.preventDefault();
+
+        }
+
+    },
+    {passive:false}
+);
+
+
+/* PINCH MOVE */
+
+$("viewerContainer").addEventListener(
+    "touchmove",
+    function(e){
+
+        if(
+            e.touches.length !== 2 ||
+            !pdfDocument
+        ){
+
+            return;
+
+        }
+
+
+        e.preventDefault();
+
+
+        const distance =
+            getTouchDistance(e);
+
+
+        if(!pinchStartDistance){
+
+            return;
+
+        }
+
+
+        const ratio =
+            distance /
+            pinchStartDistance;
+
+
+        let newScale =
+            pinchStartScale *
+            ratio;
+
+
+        newScale =
+            Math.max(
+                0.5,
+                Math.min(
+                    3,
+                    newScale
+                )
+            );
+
+
+        scale =
+            newScale;
+
+
+        /*
+           सिर्फ visual zoom
+           ताकि pinch smooth रहे।
+        */
+
+        $("pages").style.transform =
+            "scale(" + scale / pinchStartScale + ")";
+
+
+        $("pages").style.transformOrigin =
+            "center top";
+
+    },
+    {passive:false}
+);
+
+
+/* PINCH END */
+
+$("viewerContainer").addEventListener(
+    "touchend",
+    async function(e){
+
+        if(
+            pinchZooming &&
+            e.touches.length < 2
+        ){
+
+            pinchZooming = false;
+
+            pinchStartDistance = 0;
+
+
+            /*
+               अब high quality में
+               pages दोबारा render।
+            */
+
+            $("pages").style.transform =
+                "none";
+
+
+            await renderAllPages();
+
+        }
+
+    },
+    {passive:false}
+);
+
+
+
+/* ================= TOOL SELECT ================= */
+
+function selectTool(name){
+
+    tool = name;
+
+
+    document
+    .querySelectorAll(
+        ".editorbar button"
+    )
+    .forEach(
+        function(btn){
+
+            btn.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    if(name === "pencil"){
+
+        $("pencilBtn")
+        .classList.add("active");
+
+        toast(
+            "✏️ Pencil चालू है"
+        );
+
+    }
+
+
+    if(name === "highlight"){
+
+        $("highlightBtn")
+        .classList.add("active");
+
+        toast(
+            "🖍️ Highlight चालू है"
+        );
+
+    }
+
+
+    if(name === "text"){
+
+        $("textBtn")
+        .classList.add("active");
+
+        toast(
+            "T Text चालू है"
+        );
+
+    }
+
+}
+
+
 
 /* ================= PENCIL ================= */
 
 $("pencilBtn").onclick =
 function(){
 
-    selectTool(
-        "pencil"
-    );
+    selectTool("pencil");
 
 };
 
@@ -1390,9 +1605,7 @@ function(){
 $("highlightBtn").onclick =
 function(){
 
-    selectTool(
-        "highlight"
-    );
+    selectTool("highlight");
 
 };
 
@@ -1403,22 +1616,21 @@ function(){
 $("textBtn").onclick =
 function(){
 
-    selectTool(
-        "text"
-    );
+    selectTool("text");
 
 };
 
 
 
-/* ================= TEXT CLICK ================= */
+/* ================= TEXT ON PDF ================= */
 
 $("pages").addEventListener(
     "click",
     function(e){
 
         if(
-            tool !== "text"
+            tool !== "text" ||
+            pinchZooming
         ){
 
             return;
@@ -1486,37 +1698,36 @@ $("pages").addEventListener(
 
 
         annotations[pageNumber]
-.push({
+        .push({
 
-    type:"text",
+            type:"text",
 
-    text:text,
+            text:text,
 
-    x:x,
+            x:x,
 
-    y:y,
+            y:y,
 
-    size:
-        Number(
-            $("textSize").value
-        ) || 20
+            size:
+                Number(
+                    $("textSize").value
+                ) || 20
 
-});
+        });
 
 
-renderPageAgain(
-    pageNumber
-);
+        renderPageAgain(
+            pageNumber
+        );
 
-}
+    }
 );
 
 
 
 /* ================= IMAGE ================= */
 
-$("imageInput")
-.addEventListener(
+$("imageInput").addEventListener(
     "change",
     function(e){
 
@@ -1528,6 +1739,21 @@ $("imageInput")
 
 
         if(!file){
+
+            return;
+
+        }
+
+
+        if(
+            !file.type.startsWith(
+                "image/"
+            )
+        ){
+
+            alert(
+                "सिर्फ image file चुनें।"
+            );
 
             return;
 
@@ -1583,7 +1809,7 @@ $("imageInput")
 
 
             toast(
-                "Image added"
+                "🖼️ Image लग गई"
             );
 
         };
@@ -1598,10 +1824,10 @@ $("imageInput")
 
 
 
-/* ================= PAGE BUTTONS ================= */
+/* ================= PREVIOUS PAGE ================= */
 
 $("prevBtn").onclick =
-async function(){
+function(){
 
     if(!pdfDocument){
 
@@ -1637,8 +1863,11 @@ async function(){
     if(page){
 
         page.scrollIntoView({
+
             behavior:"smooth",
+
             block:"start"
+
         });
 
     }
@@ -1647,8 +1876,10 @@ async function(){
 
 
 
+/* ================= NEXT PAGE ================= */
+
 $("nextBtn").onclick =
-async function(){
+function(){
 
     if(!pdfDocument){
 
@@ -1687,8 +1918,11 @@ async function(){
     if(page){
 
         page.scrollIntoView({
+
             behavior:"smooth",
+
             block:"start"
+
         });
 
     }
@@ -1697,10 +1931,9 @@ async function(){
 
 
 
-/* ================= PAGE INPUT ================= */
+/* ================= PAGE NUMBER ================= */
 
-$("pageInput")
-.addEventListener(
+$("pageInput").addEventListener(
     "change",
     function(){
 
@@ -1744,8 +1977,11 @@ $("pageInput")
         if(page){
 
             page.scrollIntoView({
+
                 behavior:"smooth",
+
                 block:"start"
+
             });
 
         }
@@ -1771,7 +2007,14 @@ async function(){
     }
 
 
-    scale += .15;
+    scale += 0.15;
+
+
+    scale =
+        Math.min(
+            3,
+            scale
+        );
 
 
     await renderAllPages();
@@ -1779,7 +2022,9 @@ async function(){
 
     toast(
         "Zoom " +
-        Math.round(scale*100) +
+        Math.round(
+            scale * 100
+        ) +
         "%"
     );
 
@@ -1805,8 +2050,8 @@ async function(){
 
     scale =
         Math.max(
-            .5,
-            scale-.15
+            0.5,
+            scale - 0.15
         );
 
 
@@ -1815,7 +2060,9 @@ async function(){
 
     toast(
         "Zoom " +
-        Math.round(scale*100) +
+        Math.round(
+            scale * 100
+        ) +
         "%"
     );
 
@@ -1823,7 +2070,7 @@ async function(){
 
 
 
-/* ================= FIT ================= */
+/* ================= FIT WIDTH ================= */
 
 $("fitBtn").onclick =
 async function(){
@@ -1843,7 +2090,7 @@ async function(){
         await pdfDocument.getPage(1);
 
 
-    const unscaled =
+    const viewport =
         firstPage.getViewport({
             scale:1
         });
@@ -1856,14 +2103,14 @@ async function(){
 
     scale =
         available /
-        unscaled.width;
+        viewport.width;
 
 
     await renderAllPages();
 
 
     toast(
-        "Fit width"
+        "↔ Fit Width"
     );
 
 };
@@ -1896,7 +2143,7 @@ async function(){
 
 
     toast(
-        "Undo"
+        "↶ Undo"
     );
 
 };
@@ -1921,7 +2168,7 @@ async function(){
 
     if(
         !confirm(
-            "सभी editing हटाएं?"
+            "सभी editing हटानी है?"
         )
     ){
 
@@ -1940,14 +2187,14 @@ async function(){
 
 
     toast(
-        "Editing clear हो गई"
+        "🗑️ Editing clear हो गई"
     );
 
 };
 
 
 
-/* ================= DOWNLOAD ================= */
+/* ================= DOWNLOAD EDITED PDF ================= */
 
 $("downloadBtn").onclick =
 async function(){
@@ -1978,22 +2225,22 @@ async function(){
             );
 
 
-        const pages =
+        const pdfPages =
             pdfDoc.getPages();
 
 
         for(
-            let i=0;
-            i<pages.length;
+            let i = 0;
+            i < pdfPages.length;
             i++
         ){
 
             const pdfPage =
-                pages[i];
+                pdfPages[i];
 
 
             const pageNumber =
-                i+1;
+                i + 1;
 
 
             const list =
@@ -2002,11 +2249,11 @@ async function(){
                 ] || [];
 
 
-            const width =
+            const pageWidth =
                 pdfPage.getWidth();
 
 
-            const height =
+            const pageHeight =
                 pdfPage.getHeight();
 
 
@@ -2014,9 +2261,11 @@ async function(){
                 const item of list
             ){
 
+
+                /* TEXT */
+
                 if(
-                    item.type ===
-                    "text"
+                    item.type === "text"
                 ){
 
                     pdfPage.drawText(
@@ -2025,13 +2274,13 @@ async function(){
 
                             x:
                                 item.x *
-                                width,
+                                pageWidth,
 
                             y:
-                                height -
+                                pageHeight -
                                 (
                                     item.y *
-                                    height
+                                    pageHeight
                                 ) -
                                 item.size,
 
@@ -2044,9 +2293,11 @@ async function(){
                 }
 
 
+
+                /* IMAGE */
+
                 if(
-                    item.type ===
-                    "image"
+                    item.type === "image"
                 ){
 
                     try{
@@ -2084,35 +2335,190 @@ async function(){
 
                                 x:
                                     item.x *
-                                    width,
+                                    pageWidth,
 
                                 y:
-                                    height -
+                                    pageHeight -
                                     (
                                         (
                                             item.y +
                                             item.h
                                         ) *
-                                        height
+                                        pageHeight
                                     ),
 
                                 width:
                                     item.w *
-                                    width,
+                                    pageWidth,
 
                                 height:
                                     item.h *
-                                    height
+                                    pageHeight
 
                             }
                         );
 
-                    }catch(err){
+                    }catch(error){
 
-                        console.warn(
-                            "Image export error",
-                            err
+                        console.error(
+                            "Image error:",
+                            error
                         );
+
+                    }
+
+                }
+
+
+
+                /* PENCIL */
+
+                if(
+                    item.type === "pencil"
+                ){
+
+                    const points =
+                        item.points || [];
+
+
+                    for(
+                        let p = 1;
+                        p < points.length;
+                        p++
+                    ){
+
+                        const a =
+                            points[p - 1];
+
+
+                        const b =
+                            points[p];
+
+
+                        pdfPage.drawLine({
+
+                            start:{
+
+                                x:
+                                    a.x *
+                                    pageWidth,
+
+                                y:
+                                    pageHeight -
+                                    (
+                                        a.y *
+                                        pageHeight
+                                    )
+
+                            },
+
+
+                            end:{
+
+                                x:
+                                    b.x *
+                                    pageWidth,
+
+                                y:
+                                    pageHeight -
+                                    (
+                                        b.y *
+                                        pageHeight
+                                    )
+
+                            },
+
+
+                            thickness:2,
+
+
+                            color:
+                                PDFLib.rgb(
+                                    0.9,
+                                    0.1,
+                                    0.1
+                                )
+
+                        });
+
+                    }
+
+                }
+
+
+
+                /* HIGHLIGHT */
+
+                if(
+                    item.type === "highlight"
+                ){
+
+                    const points =
+                        item.points || [];
+
+
+                    for(
+                        let p = 1;
+                        p < points.length;
+                        p++
+                    ){
+
+                        const a =
+                            points[p - 1];
+
+
+                        const b =
+                            points[p];
+
+
+                        pdfPage.drawLine({
+
+                            start:{
+
+                                x:
+                                    a.x *
+                                    pageWidth,
+
+                                y:
+                                    pageHeight -
+                                    (
+                                        a.y *
+                                        pageHeight
+                                    )
+
+                            },
+
+
+                            end:{
+
+                                x:
+                                    b.x *
+                                    pageWidth,
+
+                                y:
+                                    pageHeight -
+                                    (
+                                        b.y *
+                                        pageHeight
+                                    )
+
+                            },
+
+
+                            thickness:12,
+
+
+                            color:
+                                PDFLib.rgb(
+                                    1,
+                                    0.9,
+                                    0
+                                ),
+
+
+                            opacity:0.35
+
+                        });
 
                     }
 
@@ -2122,6 +2528,9 @@ async function(){
 
         }
 
+
+
+        /* ================= SAVE ================= */
 
         const output =
             await pdfDoc.save();
@@ -2143,17 +2552,17 @@ async function(){
             );
 
 
-        const a =
+        const link =
             document.createElement(
                 "a"
             );
 
 
-        a.href =
+        link.href =
             url;
 
 
-        const name =
+        const originalName =
             currentFile &&
             currentFile.name
             ?
@@ -2162,8 +2571,8 @@ async function(){
             "document.pdf";
 
 
-        a.download =
-            name.replace(
+        link.download =
+            originalName.replace(
                 /\.pdf$/i,
                 ""
             ) +
@@ -2171,34 +2580,38 @@ async function(){
 
 
         document.body.appendChild(
-            a
+            link
         );
 
 
-        a.click();
+        link.click();
 
 
-        a.remove();
+        link.remove();
 
 
         setTimeout(
-            ()=>{
+            function(){
+
                 URL.revokeObjectURL(
                     url
                 );
+
             },
             3000
         );
 
 
         toast(
-            "Edited PDF download हो गई"
+            "⬇️ Edited PDF download हो गई"
         );
 
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
 
         alert(
@@ -2225,8 +2638,7 @@ function(){
 
 /* ================= SCROLL PAGE TRACK ================= */
 
-$("viewerContainer")
-.addEventListener(
+$("viewerContainer").addEventListener(
     "scroll",
     function(){
 
@@ -2236,33 +2648,35 @@ $("viewerContainer")
             );
 
 
-        let closest =
-            1;
+        let closestPage = 1;
 
-
-        let distance =
+        let closestDistance =
             Infinity;
 
 
         pageElements.forEach(
-            page=>{
+            function(page){
 
                 const rect =
                     page.getBoundingClientRect();
 
 
-                const d =
+                const distance =
                     Math.abs(
-                        rect.top -
-                        70
+                        rect.top - 70
                     );
 
 
-                if(d < distance){
+                if(
+                    distance <
+                    closestDistance
+                ){
 
-                    distance = d;
+                        closestDistance =
+                        distance;
 
-                    closest =
+
+                    closestPage =
                         Number(
                             page.dataset.page
                         );
@@ -2274,18 +2688,21 @@ $("viewerContainer")
 
 
         currentPage =
-            closest;
+            closestPage;
 
 
         $("pageInput").value =
-            closest;
+            closestPage;
 
     }
 );
 
+
+/* ================= END ================= */
 
 </script>
 
 </body>
 
 </html>
+           
